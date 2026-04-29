@@ -542,7 +542,7 @@ body {{{{ font-family: 'Inter', Arial, sans-serif; background: #0a1628; color: #
             <div class="row"><span class="label">Active until</span><span class="val">{end_str}</span></div>
         </div>
         {tx_block_html}
-        <p>You'll be added to the <span class="highlight">Premium Signal Group</span> on Telegram within 24 hours — entries, take profits, stop losses, and risk scores straight to your phone.</p>
+        <p>You'll be added to the <span class="highlight">Signal Group</span> on Telegram within 24 hours — entries, take profits, stop losses, and risk scores straight to your phone.</p>
         <p>Your live PnL dashboard and signals feed are already unlocked on ratsignal.com:</p>
         <p style="text-align:center;"><a class="cta" href="https://ratsignal.com/auth/dashboard">Open Dashboard →</a></p>
         <hr class="divider">
@@ -562,7 +562,7 @@ Amount:       ${amount_usd} USD
 Active until: {end_str}
 {tx_block_text}---
 
-You'll be added to the Premium Signal Group on Telegram within 24 hours — entries, take profits, stop losses, and risk scores straight to your phone.
+You'll be added to the Signal Group on Telegram within 24 hours — entries, take profits, stop losses, and risk scores straight to your phone.
 
 Your live PnL dashboard and signals feed are already unlocked:
 → https://ratsignal.com/auth/dashboard

@@ -281,7 +281,7 @@ body {{ font-family: 'Inter', Arial, sans-serif; background: #0a1628; color: #f0
             Thank you for joining the colony. You just secured your seat at the smartest kitchen.
         </p>
         <p>
-            Our team will add you to the <span class="highlight">Premium Signal Group</span> within the next 24 hours.
+            Our team will add you to the <span class="highlight">Signal Group</span> within the next 24 hours.
             Once you're in, you'll receive real-time alerts — entries, take profits, stop losses, and risk scores — straight to your Telegram.
         </p>
         <p>
@@ -310,7 +310,7 @@ body {{ font-family: 'Inter', Arial, sans-serif; background: #0a1628; color: #f0
 
 Thank you for joining the colony. You just secured your seat at the smartest kitchen.
 
-Our team will add you to the Premium Signal Group within the next 24 hours.
+Our team will add you to the Signal Group within the next 24 hours.
 Once you're in, you'll receive real-time alerts - entries, take profits, stop losses, and risk scores - straight to your Telegram.
 
 We've been cooking with data from 438 books, 1,032 indicators, and 5+ years of market history.
@@ -1083,6 +1083,34 @@ def profile_update():
 
     flash("Profile updated successfully.", "success")
     return redirect("/auth/profile")
+
+
+@auth_bp.route("/email", methods=["POST"])
+@login_required
+def update_email_only():
+    """JSON endpoint: update only the user's email.
+
+    Used by the inline "this isn't your email - change it" widget on
+    /auth/auto-trade for Telegram-registered users with a placeholder
+    `telegram_*@ratsignal.local` address. Avoids the profile_update
+    route's first_name/last_name requirement.
+    """
+    new_email = (request.form.get("email") or request.values.get("email") or "").strip().lower()
+    if not _validate_email(new_email):
+        return jsonify({"ok": False, "error": "Please enter a valid email address."}), 400
+    user = models.get_user_by_id(current_user.id) or {}
+    current_email = (user.get("email") or "").strip().lower()
+    if new_email == current_email:
+        return jsonify({"ok": True, "unchanged": True})
+    existing = models.get_user_by_email(new_email)
+    if existing and existing.get("id") != current_user.id:
+        return jsonify({"ok": False, "error": "That email is already in use by another account."}), 409
+    try:
+        models.update_user_profile(current_user.id, {"email": new_email})
+    except Exception as e:
+        print(f"[RatSignal] update_email_only error user={current_user.id}: {e}", flush=True)
+        return jsonify({"ok": False, "error": "Could not save your new email. Please try again."}), 500
+    return jsonify({"ok": True, "email": new_email})
 
 
 def _has_active_copycat_token(user_id: int) -> bool:
@@ -1884,12 +1912,12 @@ _HOSTED_BOTS_AUTH = ("slipstream", "quickbite")
 
 @auth_bp.route("/auto-trade", methods=["GET"])
 def auto_trade():
-    from flask import render_template, session
+    from flask import render_template
     from temporary.ratsignal import models, hosted
 
-    user_id = session.get("user_id")
+    is_logged_in = HAS_FLASK_LOGIN and current_user.is_authenticated
+    user_id = current_user.id if is_logged_in else None
     user = models.get_user_by_id(user_id) if user_id else None
-    is_logged_in = user is not None
     sub_active = hosted.is_subscription_active_for_hosted(user) if user else False
 
     bot_data = []
@@ -1922,14 +1950,14 @@ def auto_trade():
 
 @auth_bp.route("/auto-trade/<bot>/setup", methods=["GET"])
 def auto_trade_setup(bot):
-    from flask import render_template, redirect, url_for, session, abort
+    from flask import render_template, redirect, url_for, abort
     from temporary.ratsignal import models, hosted
 
     if bot not in _HOSTED_BOTS_AUTH:
         abort(404)
-    user_id = session.get("user_id")
-    if not user_id:
+    if not (HAS_FLASK_LOGIN and current_user.is_authenticated):
         return redirect(url_for("auth.login_page"))
+    user_id = current_user.id
     user = models.get_user_by_id(user_id)
     if not user:
         return redirect(url_for("auth.login_page"))

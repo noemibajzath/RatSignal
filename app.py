@@ -745,12 +745,17 @@ _HOSTED_BOTS = ("slipstream", "quickbite")
 
 
 def _hosted_user_or_401():
-    """Return (user_id, user_dict) or (None, error_response)."""
-    from flask import jsonify, session
+    """Return ((user_id, user_dict), None) or (None, error_response).
+
+    Source of truth for "logged in" is Flask-Login (writes session["_user_id"]),
+    NOT a raw session["user_id"] key - that key is never set anywhere.
+    """
+    from flask import jsonify
+    from flask_login import current_user
     from temporary.ratsignal import models
-    user_id = session.get("user_id")
-    if not user_id:
+    if not current_user.is_authenticated:
         return None, (jsonify({"ok": False, "error": "not_logged_in"}), 401)
+    user_id = current_user.id
     user = models.get_user_by_id(user_id)
     if not user:
         return None, (jsonify({"ok": False, "error": "not_logged_in"}), 401)
@@ -1087,7 +1092,7 @@ def _generate_reply(msg):
 
     # ── Account / registration ──
     if any(w in msg for w in ["register", "sign up", "signup", "create account", "join", "get started", "regisztrál", "kezd"]):
-        return "🚀 **Getting started is easy:**\n\n1. [Create your account](/auth/register) - just name, email, Telegram username, and password\n2. We'll add you to the Premium Signal Group within 24 hours\n3. Start receiving real-time signals on Telegram!\n\nFirst month is only $50, and you can cancel for free in the first week."
+        return "🚀 **Getting started is easy:**\n\n1. [Create your account](/auth/register) - just name, email, Telegram username, and password\n2. We'll add you to the Signal Group within 24 hours\n3. Start receiving real-time signals on Telegram!\n\nFirst month is only $50, and you can cancel for free in the first week."
 
     # ── Login / password ──
     if any(w in msg for w in ["login", "log in", "sign in", "password", "forgot", "reset", "can't login", "cant login", "belépés", "jelszó"]):
