@@ -730,58 +730,23 @@
                 {% endif %}
             </div>
             {% endif %}
-
             {% if request.args.get('test') == '1' %}
-            <div data-plan-scope="test" style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.08);border:1px dashed #06B6D4;border-radius:8px;">
-                <div style="font-size:0.8rem;color:#06B6D4;margin-bottom:8px;font-family:'JetBrains Mono',monospace;">// ADMIN TEST MODE - $1 / 1-day</div>
-                <div class="currency-picker-wrap" data-currency-picker data-default="usdtmatic" style="margin:0 0 10px;">
-                    <div class="currency-picker-row">
-                        <select class="currency-select token-select" aria-label="Token">
-                            <option value="USDT">USDT</option>
-                        </select>
-                        <select class="currency-select chain-select" aria-label="Chain">
-                            <option value="usdtmatic">Polygon</option>
-                        </select>
-                    </div>
+            <div style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.08);border:1px dashed #06B6D4;border-radius:8px;">
+                <div style="font-size:0.8rem;color:#06B6D4;margin-bottom:10px;font-family:'JetBrains Mono',monospace;">// ADMIN TEST MODE - $1 / 1-day</div>
+                <div style="font-size:0.78rem;color:#8888a0;margin-bottom:10px;line-height:1.5;">
+                    Generates a NOWPayments invoice. On the next page you can pick <strong>any currency / chain</strong> they support (BTC, ETH, USDT on any chain, SOL, TRX, DOGE, …) and pay manually from any wallet.
                 </div>
-                <form action="/payments/crypto-wallet-pay" method="POST" style="display:inline;">
+                <form action="/payments/crypto-checkout" method="POST" style="display:inline;">
                     <input type="hidden" name="plan" value="test">
-                    <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
-                    <button type="submit" style="padding:8px 16px;background:transparent;border:1px solid #06B6D4;border-radius:6px;color:#06B6D4;font-size:0.8rem;font-weight:600;cursor:pointer;">Test Subscribe ($1, 1-day access)</button>
+                    <button type="submit" style="padding:8px 16px;background:transparent;border:1px solid #06B6D4;border-radius:6px;color:#06B6D4;font-size:0.8rem;font-weight:600;cursor:pointer;">Test Subscribe ($1, 1-day access) — any chain</button>
                 </form>
             </div>
             {% endif %}
 
             <div class="telegram-notice" style="margin-top:20px;">
-                <strong>Telegram Signal Group:</strong> Our team will add you to the Signal Group within 24 hours of registration. You'll receive real-time alerts straight to your Telegram.
+                <strong>Telegram Signal Group:</strong> Our team will add you to the Premium Signal Group within 24 hours of registration. You'll receive real-time alerts straight to your Telegram.
             </div>
         </div>
-
-        <!-- TELEGRAM COPY TRADER CARD (standalone, was nested) -->
-        {% if telegram_bot_username %}
-        <div class="profile-card">
-            <h2>Copy Trader - Telegram Link</h2>
-            <p style="color:var(--text-secondary); margin:0 0 16px 0; font-size:0.9rem;">
-                Link your Telegram to use the Copy Trader. The bot (@RatSignal_CopyBot) needs this link to verify your subscription when you run /gettoken.
-            </p>
-            {% if telegram_linked %}
-            <p style="margin:0; color:#4ade80;">
-                ✅ Telegram account linked. You can use <code>/gettoken</code> on <a href="https://t.me/RatSignal_CopyBot" target="_blank" rel="noopener" style="color:#4ade80;">@RatSignal_CopyBot</a>.
-            </p>
-            {% else %}
-            <p style="margin:0 0 16px 0; color:#fbbf24;">
-                ⚠️ Telegram not linked yet. Click the button below to link it.
-            </p>
-            <div style="position:relative; display:inline-block;">
-                <script async src="https://telegram.org/js/telegram-widget.js?22"
-                        data-telegram-login="{{ telegram_bot_username }}"
-                        data-size="large"
-                        data-auth-url="https://ratsignal.com/auth/telegram/callback"
-                        data-request-access="write"></script>
-            </div>
-            {% endif %}
-        </div>
-        {% endif %}
 
         <!-- PERSONAL INFO CARD -->
         <div class="profile-card">
@@ -1076,7 +1041,14 @@
             <div class="profile-complete-hint">We'll send payment receipts and renewal reminders here.</div>
         </div>
 
-<div id="pc-error" class="profile-complete-error" style="display:none;"></div>
+        <div id="pc-merge-panel" style="display:none;margin:4px 0 14px;padding:12px 14px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.3);border-radius:10px;">
+            <div id="pc-merge-msg" style="font-size:0.85rem;color:#06B6D4;margin-bottom:10px;line-height:1.5;"></div>
+            <label for="pc-merge-password" style="display:block;font-size:0.72rem;color:#8888a0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;font-weight:600;">Password for the existing account</label>
+            <input type="password" id="pc-merge-password" name="merge_password" placeholder="••••••••"
+                   style="width:100%;padding:12px 14px;background:rgba(10,22,40,0.7);border:1px solid #1a2d4a;border-radius:10px;color:#f0f0f5;font-family:'Inter',sans-serif;font-size:0.95rem;outline:none;">
+        </div>
+
+        <div id="pc-error" class="profile-complete-error" style="display:none;"></div>
 
         <button type="submit" id="pc-submit" class="profile-complete-btn">Save and continue →</button>
     </form>
@@ -1216,7 +1188,21 @@ body.pc-locked { overflow: hidden; }
                 window.location.href = r.data.redirect || '/auth/profile';
                 return;
             }
-showErr((r.data && r.data.error) || ('Server returned ' + r.status));
+            if (r.data && r.data.merge_required) {
+                // Email belongs to an existing account - reveal the password field
+                // so the user can prove ownership and we can merge the two accounts.
+                var panel = document.getElementById('pc-merge-panel');
+                var msg = document.getElementById('pc-merge-msg');
+                var pw  = document.getElementById('pc-merge-password');
+                if (msg) msg.innerHTML = r.data.message || 'Enter password to link accounts.';
+                if (panel) panel.style.display = 'block';
+                if (pw) { pw.required = true; pw.focus(); }
+                btn.disabled = false;
+                btn.textContent = 'Merge and sign in →';
+                err.style.display = 'none';
+                return;
+            }
+            showErr((r.data && r.data.error) || ('Server returned ' + r.status));
         }).catch(function(e) {
             console.error('[RatSignal] complete-profile fetch error:', e);
             showErr('Network error: ' + e.message + '. Please retry.');
