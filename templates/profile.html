@@ -1076,14 +1076,7 @@
             <div class="profile-complete-hint">We'll send payment receipts and renewal reminders here.</div>
         </div>
 
-        <div id="pc-merge-panel" style="display:none;margin:4px 0 14px;padding:12px 14px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.3);border-radius:10px;">
-            <div id="pc-merge-msg" style="font-size:0.85rem;color:#06B6D4;margin-bottom:10px;line-height:1.5;"></div>
-            <label for="pc-merge-password" style="display:block;font-size:0.72rem;color:#8888a0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;font-weight:600;">Password for the existing account</label>
-            <input type="password" id="pc-merge-password" name="merge_password" placeholder="••••••••"
-                   style="width:100%;padding:12px 14px;background:rgba(10,22,40,0.7);border:1px solid #1a2d4a;border-radius:10px;color:#f0f0f5;font-family:'Inter',sans-serif;font-size:0.95rem;outline:none;">
-        </div>
-
-        <div id="pc-error" class="profile-complete-error" style="display:none;"></div>
+<div id="pc-error" class="profile-complete-error" style="display:none;"></div>
 
         <button type="submit" id="pc-submit" class="profile-complete-btn">Save and continue →</button>
     </form>
@@ -1223,21 +1216,7 @@ body.pc-locked { overflow: hidden; }
                 window.location.href = r.data.redirect || '/auth/profile';
                 return;
             }
-            if (r.data && r.data.merge_required) {
-                // Email belongs to an existing account - reveal the password field
-                // so the user can prove ownership and we can merge the two accounts.
-                var panel = document.getElementById('pc-merge-panel');
-                var msg = document.getElementById('pc-merge-msg');
-                var pw  = document.getElementById('pc-merge-password');
-                if (msg) msg.innerHTML = r.data.message || 'Enter password to link accounts.';
-                if (panel) panel.style.display = 'block';
-                if (pw) { pw.required = true; pw.focus(); }
-                btn.disabled = false;
-                btn.textContent = 'Merge and sign in →';
-                err.style.display = 'none';
-                return;
-            }
-            showErr((r.data && r.data.error) || ('Server returned ' + r.status));
+showErr((r.data && r.data.error) || ('Server returned ' + r.status));
         }).catch(function(e) {
             console.error('[RatSignal] complete-profile fetch error:', e);
             showErr('Network error: ' + e.message + '. Please retry.');

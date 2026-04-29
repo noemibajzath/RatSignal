@@ -902,19 +902,14 @@ def complete_profile():
         return _err("Please enter a valid email address.")
 
     current_email = (user.get("email") or "").strip().lower()
-    merge_password = request.form.get("merge_password", "")
 
     if new_email.lower() != current_email:
-        existing = models.get_user_by_email(new_email)
-        if existing and existing.get("id") != current_user.id:
-            # Email is already registered — offer to merge this throwaway
-            # social account into the existing one rather than rejecting.
-            return _try_account_merge(
-                current=user,
-                target=existing,
-                first_name=first_name,
-                last_name=last_name,
-                merge_password=merge_password,
+        ok, err = models.set_user_email_with_merge(current_user.id, new_email)
+        if not ok:
+            return _err(
+                err or "This email is already in use by another account. "
+                "Please use a different email or contact support.",
+                status=409,
             )
 
     try:
@@ -922,7 +917,6 @@ def complete_profile():
             "first_name": first_name,
             "last_name": last_name,
             "display_name": f"{first_name} {last_name}".strip(),
-            "email": new_email,
         })
         fresh = models.get_user_profile(current_user.id) or {}
         print(f"[RatSignal] complete-profile saved user={current_user.id} "
