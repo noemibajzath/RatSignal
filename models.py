@@ -205,6 +205,68 @@ def reassign_payments(from_user_id: int, to_user_id: int):
         conn.execute("UPDATE payments SET user_id=? WHERE user_id=?",
                      (to_user_id, from_user_id))
 
+def set_user_email_with_merge(user_id: int, new_email: str) -> tuple[bool, str | None]:
+    """Update a user's email, auto-merging a safe orphan account if needed.
+
+    Used when a social-auth user (e.g. Telegram, which has no email) sets
+    their real email later, and that email already exists on a different
+    "orphan" account they previously created via email+password.
+
+    The other account is treated as a safe orphan if it has no payments,
+    no active subscription, and no social IDs that conflict with the
+    current user's own social IDs. In that case the orphan's password_hash
+    is copied to the current user (so email+password login still works),
+    any payments are reassigned defensively, password reset tokens are
+    deleted, the orphan row is deleted, then the current user's email is
+    updated.
+
+    Returns (success, error_message). On (False, msg) the caller should
+    show msg as a flash / JSON error.
+    """
+    new_email = (new_email or "").strip().lower()
+    if not new_email:
+        return (False, "Email is required.")
+    with _get_conn() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id, telegram_id, google_id, discord_id FROM users WHERE id=?",
+            (user_id,),
+        )
+        current_row = cur.fetchone()
+        if not current_row:
+            return (False, "User not found.")
+        cur.execute(
+            "SELECT id, telegram_id, google_id, discord_id, subscription_status, password_hash "
+            "FROM users WHERE lower(email)=? AND id!=?",
+            (new_email, user_id),
+        )
+        other = cur.fetchone()
+        if not other:
+            cur.execute("UPDATE users SET email=? WHERE id=?", (new_email, user_id))
+            return (True, None)
+        other_id = other["id"]
+        cur.execute("SELECT 1 FROM payments WHERE user_id=? LIMIT 1", (other_id,))
+        if cur.fetchone():
+            return (False, "That email is already in use by another account.")
+        if (other["subscription_status"] or "") in ("active", "trialing", "lifetime", "paid"):
+            return (False, "That email is already in use by an active account.")
+        for field in ("telegram_id", "google_id", "discord_id"):
+            other_val = other[field]
+            current_val = current_row[field]
+            if other_val and str(other_val) != str(current_val or ""):
+                return (False, "That email is already in use by another account.")
+        if other["password_hash"]:
+            cur.execute(
+                "UPDATE users SET password_hash=? WHERE id=?",
+                (other["password_hash"], user_id),
+            )
+        cur.execute("UPDATE payments SET user_id=? WHERE user_id=?", (user_id, other_id))
+        cur.execute("DELETE FROM password_reset_tokens WHERE user_id=?", (other_id,))
+        cur.execute("DELETE FROM users WHERE id=?", (other_id,))
+        cur.execute("UPDATE users SET email=? WHERE id=?", (new_email, user_id))
+        return (True, None)
+
+
 
 def link_discord(user_id: int, discord_id: str):
     """Link a Discord ID to an existing user."""

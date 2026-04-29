@@ -1068,11 +1068,12 @@ def profile_update():
         if not _validate_email(new_email):
             flash("Please enter a valid email address.", "error")
             return redirect("/auth/profile")
-        existing = models.get_user_by_email(new_email)
-        if existing and existing.get("id") != current_user.id:
-            flash("That email is already in use by another account.", "error")
+        ok, err = models.set_user_email_with_merge(current_user.id, new_email)
+        if not ok:
+            flash(err or "That email is already in use by another account.", "error")
             return redirect("/auth/profile")
-        fields["email"] = new_email
+        # set_user_email_with_merge already wrote the new email — don't re-set it via fields
+        fields.pop("email", None)
 
     try:
         models.update_user_profile(current_user.id, fields)
@@ -1102,14 +1103,13 @@ def update_email_only():
     current_email = (user.get("email") or "").strip().lower()
     if new_email == current_email:
         return jsonify({"ok": True, "unchanged": True})
-    existing = models.get_user_by_email(new_email)
-    if existing and existing.get("id") != current_user.id:
-        return jsonify({"ok": False, "error": "That email is already in use by another account."}), 409
     try:
-        models.update_user_profile(current_user.id, {"email": new_email})
+        ok, err = models.set_user_email_with_merge(current_user.id, new_email)
     except Exception as e:
         print(f"[RatSignal] update_email_only error user={current_user.id}: {e}", flush=True)
         return jsonify({"ok": False, "error": "Could not save your new email. Please try again."}), 500
+    if not ok:
+        return jsonify({"ok": False, "error": err or "That email is already in use by another account."}), 409
     return jsonify({"ok": True, "email": new_email})
 
 
