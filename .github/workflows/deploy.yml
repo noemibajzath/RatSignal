@@ -1,0 +1,26 @@
+name: Deploy to ratsignal.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 89.167.21.61 >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/id_ed25519 root@89.167.21.61 << 'ENDSSH'
+            set -e
+            cd /root/prediction_market_strategies/temporary/ratsignal
+            git pull origin main
+            systemctl restart ratsignal
+            echo "Deploy successful at $(date)"
+          ENDSSH
