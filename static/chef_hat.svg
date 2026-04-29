@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220">
+  <!-- Puffy top clouds -->
+  <ellipse cx="100" cy="70" rx="65" ry="50" fill="white" stroke="#222" stroke-width="3.5"/>
+  <ellipse cx="60" cy="65" rx="40" ry="38" fill="white" stroke="#222" stroke-width="3.5"/>
+  <ellipse cx="140" cy="65" rx="40" ry="38" fill="white" stroke="#222" stroke-width="3.5"/>
+  <ellipse cx="100" cy="45" rx="35" ry="30" fill="white" stroke="#222" stroke-width="3.5"/>
+  <!-- White fill to cover internal strokes -->
+  <ellipse cx="100" cy="70" rx="60" ry="44" fill="white"/>
+  <!-- Band / base -->
+  <path d="M45,120 L45,170 Q45,185 60,185 L140,185 Q155,185 155,170 L155,120 Z" fill="white" stroke="#222" stroke-width="3.5"/>
+  <!-- Wrinkle lines on band -->
+  <line x1="75" y1="125" x2="73" y2="178" stroke="#bcc8d0" stroke-width="1.5"/>
+  <line x1="95" y1="122" x2="94" y2="180" stroke="#bcc8d0" stroke-width="1.5"/>
+  <line x1="115" y1="125" x2="116" y2="178" stroke="#bcc8d0" stroke-width="1.5"/>
+  <!-- Connection area -->
+  <path d="M48,120 Q100,135 152,120" fill="none" stroke="#222" stroke-width="2.5"/>
+  <!-- Light blue shading -->
+  <ellipse cx="100" cy="75" rx="45" ry="25" fill="rgba(190,215,225,0.3)"/>
+  <rect x="50" y="155" width="100" height="20" rx="5" fill="rgba(190,215,225,0.15)"/>
+</svg>

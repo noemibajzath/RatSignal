@@ -1,0 +1,1681 @@
+{# ============================================================
+   SHOWCASE SECTIONS — RatSignal Landing Page
+   One premium variant per section. 21st.dev quality.
+   Include via: {% include 'partials/showcase_sections.html' %}
+   ============================================================ #}
+
+
+{# ============================
+   1. PIPELINE / HOW IT WORKS
+   ============================ #}
+<div class="showcase-section" id="pipeline-v1">
+<div class="showcase-variant-wrapper" data-label="Pipeline">
+
+<section class="sc-pipeline">
+    <div class="sc-pipeline__header">
+        <span class="sc-label">THE PIPELINE</span>
+        <h2 class="sc-title">How the Recipe Works</h2>
+        <p class="sc-subtitle">From raw data to profitable signals in three steps.</p>
+    </div>
+
+    <div class="sc-pipeline__grid">
+        <div class="sc-pipeline__card" data-step="1">
+            <div class="sc-pipeline__bg-num">01</div>
+            <div class="sc-pipeline__icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="24" cy="24" r="18" opacity="0.15"/>
+                    <circle cx="24" cy="24" r="10" opacity="0.3"/>
+                    <circle cx="24" cy="24" r="3"/>
+                    <line x1="24" y1="6" x2="24" y2="10"/>
+                    <line x1="24" y1="38" x2="24" y2="42"/>
+                    <line x1="6" y1="24" x2="10" y2="24"/>
+                    <line x1="38" y1="24" x2="42" y2="24"/>
+                </svg>
+            </div>
+            <h3 class="sc-pipeline__card-title">Scan</h3>
+            <p class="sc-pipeline__card-desc">147 indicators scan 6 crypto pairs every 15 minutes</p>
+        </div>
+
+        <div class="sc-pipeline__connector">
+            <div class="sc-pipeline__line"></div>
+            <div class="sc-pipeline__dot"></div>
+        </div>
+
+        <div class="sc-pipeline__card" data-step="2">
+            <div class="sc-pipeline__bg-num">02</div>
+            <div class="sc-pipeline__icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M24 6 C24 6 10 14 10 26 C10 34 16 42 24 42 C32 42 38 34 38 26 C38 14 24 6 24 6Z" opacity="0.15" fill="var(--cyan)" stroke="none"/>
+                    <circle cx="24" cy="22" r="6"/>
+                    <path d="M20 30 L16 38"/>
+                    <path d="M28 30 L32 38"/>
+                    <path d="M24 28 L24 38"/>
+                    <circle cx="24" cy="22" r="2" fill="var(--cyan)" stroke="none"/>
+                </svg>
+            </div>
+            <h3 class="sc-pipeline__card-title">Analyze</h3>
+            <p class="sc-pipeline__card-desc">ATLAS AI evaluates signal confluence and market regime</p>
+        </div>
+
+        <div class="sc-pipeline__connector">
+            <div class="sc-pipeline__line"></div>
+            <div class="sc-pipeline__dot"></div>
+        </div>
+
+        <div class="sc-pipeline__card" data-step="3">
+            <div class="sc-pipeline__bg-num">03</div>
+            <div class="sc-pipeline__icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M24 6 L24 20"/>
+                    <path d="M24 20 L18 28 L22 28 L20 42"/>
+                    <path d="M24 20 L30 28 L26 28 L28 42"/>
+                    <circle cx="24" cy="6" r="2" fill="var(--cyan)" stroke="none"/>
+                </svg>
+            </div>
+            <h3 class="sc-pipeline__card-title">Execute</h3>
+            <p class="sc-pipeline__card-desc">9 bots execute with precision risk management</p>
+        </div>
+    </div>
+</section>
+
+<style>
+.sc-pipeline {
+    padding: 120px 0 100px;
+    position: relative;
+}
+.sc-pipeline__header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+.sc-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    display: block;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+.sc-title {
+    font-family: var(--font);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 16px;
+}
+.sc-title em {
+    font-style: italic;
+    font-family: var(--font-serif);
+    color: var(--gold);
+}
+.sc-subtitle {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+.sc-pipeline__grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.sc-pipeline__card {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+    padding: 48px 32px 40px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    text-align: center;
+    overflow: hidden;
+    transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
+    will-change: transform;
+}
+.sc-pipeline__card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0,212,255,0.06), transparent 40%);
+    pointer-events: none;
+}
+.sc-pipeline__card:hover::before {
+    opacity: 1;
+}
+.sc-pipeline__card:hover {
+    border-color: rgba(0,212,255,0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(0,212,255,0.05);
+}
+.sc-pipeline__bg-num {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    font-family: var(--font-mono);
+    font-size: 120px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.025);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}
+.sc-pipeline__icon {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+.sc-pipeline__icon svg {
+    filter: drop-shadow(0 0 12px rgba(0,212,255,0.3));
+}
+.sc-pipeline__card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.sc-pipeline__card-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+.sc-pipeline__connector {
+    position: relative;
+    width: 60px;
+    min-width: 40px;
+    height: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sc-pipeline__line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent);
+}
+.sc-pipeline__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    animation: sc-dot-travel 3s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+@keyframes sc-dot-travel {
+    0%, 100% { transform: translateX(-20px); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    50% { transform: translateX(20px); }
+}
+
+@media (max-width: 768px) {
+    .sc-pipeline__grid {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .sc-pipeline__card {
+        max-width: 100%;
+        width: 100%;
+    }
+    .sc-pipeline__connector {
+        width: 2px;
+        height: 40px;
+        min-width: unset;
+    }
+    .sc-pipeline__line {
+        width: 1px;
+        height: 100%;
+        background: linear-gradient(180deg, transparent, rgba(0,212,255,0.4), transparent);
+    }
+    .sc-pipeline__dot {
+        animation: sc-dot-travel-v 3s ease-in-out infinite;
+    }
+    @keyframes sc-dot-travel-v {
+        0%, 100% { transform: translateY(-12px); opacity: 0; }
+        20% { opacity: 1; }
+        80% { opacity: 1; }
+        50% { transform: translateY(12px); }
+    }
+}
+</style>
+
+<script>
+(function() {
+    /* Spotlight hover effect */
+    document.querySelectorAll('.sc-pipeline__card').forEach(function(card) {
+        card.addEventListener('mousemove', function(e) {
+            var rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+            card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+        });
+    });
+
+    /* GSAP scroll entrance */
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.sc-pipeline__card', {
+            y: 60,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            stagger: 0.15,
+            scrollTrigger: {
+                trigger: '.sc-pipeline__grid',
+                start: 'top 85%',
+                once: true
+            }
+        });
+        gsap.from('.sc-pipeline__connector', {
+            scaleX: 0,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.out',
+            stagger: 0.15,
+            scrollTrigger: {
+                trigger: '.sc-pipeline__grid',
+                start: 'top 85%',
+                once: true
+            }
+        });
+    }
+})();
+</script>
+
+</div>
+</div>
+
+
+{# ============================
+   2. SIGNALS — LIVE FEED
+   ============================ #}
+<div class="showcase-section" id="signals-v1">
+<div class="showcase-variant-wrapper" data-label="Signals">
+
+<section class="sc-signals">
+    <div class="sc-signals__header">
+        <div class="sc-signals__header-row">
+            <div>
+                <span class="sc-label">SIGNALS</span>
+                <h2 class="sc-title">Live Signals Feed</h2>
+                <p class="sc-subtitle">Real-time trading intelligence from our indicator engine.</p>
+            </div>
+            <div class="sc-signals__live-badge">
+                <span class="sc-signals__live-dot"></span>
+                LIVE
+            </div>
+        </div>
+    </div>
+
+    <div class="sc-signals__grid">
+        {# Signal 1 - BTC LONG #}
+        <div class="sc-signals__card sc-signals__card--long">
+            <div class="sc-signals__card-top">
+                <span class="sc-signals__pair">BTC/USDT</span>
+                <span class="sc-signals__dir sc-signals__dir--long">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    LONG
+                </span>
+                <span class="sc-signals__time">3 min ago</span>
+            </div>
+            <div class="sc-signals__body">
+                <div class="sc-signals__confluence">Confluence: <strong>4/5</strong> indicators agree</div>
+                <div class="sc-signals__conf-row">
+                    <span class="sc-signals__conf-label">Confidence</span>
+                    <span class="sc-signals__conf-value">82%</span>
+                </div>
+                <div class="sc-signals__bar-track">
+                    <div class="sc-signals__bar-fill sc-signals__bar-fill--long" style="width:82%"></div>
+                </div>
+            </div>
+        </div>
+
+        {# Signal 2 - ETH SHORT #}
+        <div class="sc-signals__card sc-signals__card--short">
+            <div class="sc-signals__card-top">
+                <span class="sc-signals__pair">ETH/USDT</span>
+                <span class="sc-signals__dir sc-signals__dir--short">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                    SHORT
+                </span>
+                <span class="sc-signals__time">7 min ago</span>
+            </div>
+            <div class="sc-signals__body">
+                <div class="sc-signals__confluence">Confluence: <strong>3/5</strong> indicators agree</div>
+                <div class="sc-signals__conf-row">
+                    <span class="sc-signals__conf-label">Confidence</span>
+                    <span class="sc-signals__conf-value">71%</span>
+                </div>
+                <div class="sc-signals__bar-track">
+                    <div class="sc-signals__bar-fill sc-signals__bar-fill--short" style="width:71%"></div>
+                </div>
+            </div>
+        </div>
+
+        {# Signal 3 - SOL LONG #}
+        <div class="sc-signals__card sc-signals__card--long">
+            <div class="sc-signals__card-top">
+                <span class="sc-signals__pair">SOL/USDT</span>
+                <span class="sc-signals__dir sc-signals__dir--long">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    LONG
+                </span>
+                <span class="sc-signals__time">12 min ago</span>
+            </div>
+            <div class="sc-signals__body">
+                <div class="sc-signals__confluence">Confluence: <strong>5/5</strong> indicators agree</div>
+                <div class="sc-signals__conf-row">
+                    <span class="sc-signals__conf-label">Confidence</span>
+                    <span class="sc-signals__conf-value">94%</span>
+                </div>
+                <div class="sc-signals__bar-track">
+                    <div class="sc-signals__bar-fill sc-signals__bar-fill--long" style="width:94%"></div>
+                </div>
+            </div>
+        </div>
+
+        {# Signal 4 - XRP SHORT #}
+        <div class="sc-signals__card sc-signals__card--short">
+            <div class="sc-signals__card-top">
+                <span class="sc-signals__pair">XRP/USDT</span>
+                <span class="sc-signals__dir sc-signals__dir--short">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                    SHORT
+                </span>
+                <span class="sc-signals__time">18 min ago</span>
+            </div>
+            <div class="sc-signals__body">
+                <div class="sc-signals__confluence">Confluence: <strong>4/5</strong> indicators agree</div>
+                <div class="sc-signals__conf-row">
+                    <span class="sc-signals__conf-label">Confidence</span>
+                    <span class="sc-signals__conf-value">78%</span>
+                </div>
+                <div class="sc-signals__bar-track">
+                    <div class="sc-signals__bar-fill sc-signals__bar-fill--short" style="width:78%"></div>
+                </div>
+            </div>
+        </div>
+
+        {# Signal 5 - BTC SHORT #}
+        <div class="sc-signals__card sc-signals__card--short">
+            <div class="sc-signals__card-top">
+                <span class="sc-signals__pair">BTC/USDT</span>
+                <span class="sc-signals__dir sc-signals__dir--short">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                    SHORT
+                </span>
+                <span class="sc-signals__time">24 min ago</span>
+            </div>
+            <div class="sc-signals__body">
+                <div class="sc-signals__confluence">Confluence: <strong>3/5</strong> indicators agree</div>
+                <div class="sc-signals__conf-row">
+                    <span class="sc-signals__conf-label">Confidence</span>
+                    <span class="sc-signals__conf-value">67%</span>
+                </div>
+                <div class="sc-signals__bar-track">
+                    <div class="sc-signals__bar-fill sc-signals__bar-fill--short" style="width:67%"></div>
+                </div>
+            </div>
+        </div>
+
+        {# Signal 6 - ETH LONG #}
+        <div class="sc-signals__card sc-signals__card--long">
+            <div class="sc-signals__card-top">
+                <span class="sc-signals__pair">ETH/USDT</span>
+                <span class="sc-signals__dir sc-signals__dir--long">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    LONG
+                </span>
+                <span class="sc-signals__time">31 min ago</span>
+            </div>
+            <div class="sc-signals__body">
+                <div class="sc-signals__confluence">Confluence: <strong>4/5</strong> indicators agree</div>
+                <div class="sc-signals__conf-row">
+                    <span class="sc-signals__conf-label">Confidence</span>
+                    <span class="sc-signals__conf-value">85%</span>
+                </div>
+                <div class="sc-signals__bar-track">
+                    <div class="sc-signals__bar-fill sc-signals__bar-fill--long" style="width:85%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.sc-signals {
+    padding: 120px 0 100px;
+}
+.sc-signals__header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 60px;
+}
+.sc-signals__header-row .sc-subtitle {
+    margin: 0;
+}
+.sc-signals__live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--negative);
+    background: rgba(255,51,102,0.08);
+    border: 1px solid rgba(255,51,102,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+.sc-signals__live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--negative);
+    animation: sc-live-pulse 2s ease-in-out infinite;
+}
+@keyframes sc-live-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,51,102,0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(255,51,102,0); }
+}
+.sc-signals__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.sc-signals__card {
+    position: relative;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 20px 24px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+}
+.sc-signals__card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+}
+.sc-signals__card--long::before {
+    background: var(--positive);
+    box-shadow: 0 0 12px rgba(0,230,118,0.3);
+}
+.sc-signals__card--short::before {
+    background: var(--negative);
+    box-shadow: 0 0 12px rgba(255,51,102,0.3);
+}
+.sc-signals__card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.1);
+}
+.sc-signals__card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.sc-signals__pair {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+    padding: 3px 10px;
+    border-radius: 6px;
+}
+.sc-signals__dir {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 6px;
+}
+.sc-signals__dir--long {
+    color: var(--positive);
+    background: rgba(0,230,118,0.08);
+}
+.sc-signals__dir--short {
+    color: var(--negative);
+    background: rgba(255,51,102,0.08);
+}
+.sc-signals__time {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: auto;
+    font-family: var(--font-mono);
+}
+.sc-signals__body {}
+.sc-signals__confluence {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+.sc-signals__confluence strong {
+    color: var(--text-primary);
+}
+.sc-signals__conf-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.sc-signals__conf-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-mono);
+}
+.sc-signals__conf-value {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.sc-signals__bar-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.sc-signals__bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sc-signals__bar-fill--long {
+    background: linear-gradient(90deg, var(--positive), rgba(0,230,118,0.6));
+    box-shadow: 0 0 8px rgba(0,230,118,0.3);
+}
+.sc-signals__bar-fill--short {
+    background: linear-gradient(90deg, var(--negative), rgba(255,51,102,0.6));
+    box-shadow: 0 0 8px rgba(255,51,102,0.3);
+}
+
+@media (max-width: 1024px) {
+    .sc-signals__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+    .sc-signals__grid { grid-template-columns: 1fr; }
+    .sc-signals__header-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+</style>
+
+<script>
+(function() {
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.sc-signals__card', {
+            y: 40,
+            opacity: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+            stagger: 0.1,
+            scrollTrigger: {
+                trigger: '.sc-signals__grid',
+                start: 'top 85%',
+                once: true
+            }
+        });
+    }
+})();
+</script>
+
+</div>
+</div>
+
+
+{# ============================
+   3. ATLAS AI TEASER
+   ============================ #}
+<div class="showcase-section" id="atlas-v1">
+<div class="showcase-variant-wrapper" data-label="ATLAS">
+
+<section class="sc-atlas">
+    <div class="sc-atlas__layout">
+        <div class="sc-atlas__text">
+            <span class="sc-label">AI ENGINE</span>
+            <h2 class="sc-atlas__name">
+                <span class="sc-atlas__gradient-text">ATLAS</span>
+            </h2>
+            <p class="sc-atlas__tagline">Autonomous Trading Logic & Adaptive Strategy engine. ATLAS monitors market conditions, adjusts risk parameters, and orchestrates all 9 bots in real-time.</p>
+
+            <div class="sc-atlas__stats">
+                <div class="sc-atlas__stat">
+                    <span class="sc-atlas__stat-value">82%</span>
+                    <span class="sc-atlas__stat-label">Confidence</span>
+                </div>
+                <div class="sc-atlas__stat">
+                    <span class="sc-atlas__stat-value sc-atlas__stat-value--bullish">Bullish</span>
+                    <span class="sc-atlas__stat-label">Mood</span>
+                </div>
+                <div class="sc-atlas__stat">
+                    <span class="sc-atlas__stat-value">3m ago</span>
+                    <span class="sc-atlas__stat-label">Last Decision</span>
+                </div>
+                <div class="sc-atlas__stat">
+                    <span class="sc-atlas__stat-value">12</span>
+                    <span class="sc-atlas__stat-label">Active Strategies</span>
+                </div>
+            </div>
+
+            <a href="#" class="sc-atlas__cta">
+                Explore ATLAS Dashboard
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+
+        <div class="sc-atlas__terminal-wrap">
+            <div class="sc-atlas__terminal">
+                <div class="sc-atlas__terminal-bar">
+                    <span class="sc-atlas__terminal-dot sc-atlas__terminal-dot--red"></span>
+                    <span class="sc-atlas__terminal-dot sc-atlas__terminal-dot--yellow"></span>
+                    <span class="sc-atlas__terminal-dot sc-atlas__terminal-dot--green"></span>
+                    <span class="sc-atlas__terminal-title">atlas@ratsignal:~$</span>
+                </div>
+                <div class="sc-atlas__terminal-body">
+                    <div class="sc-atlas__terminal-scanline"></div>
+                    <div class="sc-atlas__terminal-lines" id="atlas-terminal-output"></div>
+                    <div class="sc-atlas__terminal-cursor"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.sc-atlas {
+    padding: 120px 0 100px;
+}
+.sc-atlas__layout {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.sc-atlas__text {
+    flex: 0 0 55%;
+}
+.sc-atlas__name {
+    margin-bottom: 20px;
+}
+.sc-atlas__gradient-text {
+    font-family: var(--font);
+    font-size: clamp(48px, 7vw, 72px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--cyan) 0%, #6366f1 40%, #e63946 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+    line-height: 1.1;
+}
+.sc-atlas__tagline {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin-bottom: 40px;
+    max-width: 480px;
+}
+.sc-atlas__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+}
+.sc-atlas__stat {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 20px;
+    transition: border-color 0.3s ease;
+}
+.sc-atlas__stat:hover {
+    border-color: rgba(0,212,255,0.15);
+}
+.sc-atlas__stat-value {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+.sc-atlas__stat-value--bullish {
+    color: var(--positive);
+}
+.sc-atlas__stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-mono);
+}
+.sc-atlas__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--cyan);
+    transition: gap 0.3s ease, opacity 0.3s ease;
+    text-decoration: none;
+}
+.sc-atlas__cta:hover {
+    gap: 14px;
+    opacity: 0.85;
+}
+
+/* Terminal */
+.sc-atlas__terminal-wrap {
+    flex: 1;
+    min-width: 0;
+}
+.sc-atlas__terminal {
+    background: #0a0f1c;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+}
+.sc-atlas__terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sc-atlas__terminal-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.sc-atlas__terminal-dot--red { background: #ff5f57; }
+.sc-atlas__terminal-dot--yellow { background: #febc2e; }
+.sc-atlas__terminal-dot--green { background: #28c840; }
+.sc-atlas__terminal-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 8px;
+}
+.sc-atlas__terminal-body {
+    position: relative;
+    padding: 20px;
+    min-height: 280px;
+    overflow: hidden;
+}
+.sc-atlas__terminal-scanline {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,230,118,0.015) 2px,
+        rgba(0,230,118,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+.sc-atlas__terminal-lines {
+    position: relative;
+    z-index: 2;
+}
+.sc-atlas__terminal-lines .t-line {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--positive);
+    white-space: pre;
+    opacity: 0;
+    transform: translateY(4px);
+}
+.sc-atlas__terminal-lines .t-line.t-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.sc-atlas__terminal-lines .t-line .t-cmd {
+    color: var(--cyan);
+}
+.sc-atlas__terminal-lines .t-line .t-ok {
+    color: var(--positive);
+}
+.sc-atlas__terminal-lines .t-line .t-val {
+    color: var(--gold);
+}
+.sc-atlas__terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: var(--positive);
+    animation: sc-blink 1s step-end infinite;
+    margin-top: 4px;
+    opacity: 0.8;
+    position: relative;
+    z-index: 2;
+}
+@keyframes sc-blink {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .sc-atlas__layout {
+        flex-direction: column;
+        gap: 40px;
+    }
+    .sc-atlas__text {
+        flex: 1;
+    }
+    .sc-atlas__terminal-body {
+        min-height: 220px;
+    }
+}
+</style>
+
+<script>
+(function() {
+    var terminalLines = [
+        { html: '<span class="t-cmd">&gt; atlas.analyze --market btc</span>' },
+        { html: '<span class="t-ok">[OK]</span> Scanning 147 indicators...' },
+        { html: '<span class="t-ok">[OK]</span> Confluence: <span class="t-val">4/5 bullish</span>' },
+        { html: '<span class="t-ok">[OK]</span> Regime: <span class="t-val">trending</span>' },
+        { html: '' },
+        { html: '<span class="t-cmd">&gt; atlas.confidence</span>' },
+        { html: '<span class="t-val">0.82</span> (HIGH)' },
+        { html: '' },
+        { html: '<span class="t-cmd">&gt; atlas.execute --bots all</span>' },
+        { html: '<span class="t-ok">[OK]</span> 9 bots updated' }
+    ];
+
+    var output = document.getElementById('atlas-terminal-output');
+    if (!output) return;
+
+    var started = false;
+
+    function runTerminal() {
+        if (started) return;
+        started = true;
+        output.innerHTML = '';
+
+        terminalLines.forEach(function(line, i) {
+            var div = document.createElement('div');
+            div.className = 't-line';
+            div.innerHTML = line.html || '&nbsp;';
+            output.appendChild(div);
+
+            setTimeout(function() {
+                div.classList.add('t-visible');
+            }, 300 + i * 400);
+        });
+    }
+
+    /* Trigger on scroll */
+    if (typeof IntersectionObserver !== 'undefined') {
+        var obs = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) {
+                runTerminal();
+                obs.disconnect();
+            }
+        }, { threshold: 0.3 });
+        obs.observe(output.closest('.sc-atlas'));
+    } else {
+        runTerminal();
+    }
+
+    /* GSAP entrance */
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.sc-atlas__text', {
+            x: -40,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.sc-atlas__layout', start: 'top 80%', once: true }
+        });
+        gsap.from('.sc-atlas__terminal-wrap', {
+            x: 40,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.sc-atlas__layout', start: 'top 80%', once: true }
+        });
+    }
+})();
+</script>
+
+</div>
+</div>
+
+
+{# ============================
+   4. PRICING
+   ============================ #}
+<div class="showcase-section" id="pricing-v1">
+<div class="showcase-variant-wrapper" data-label="Pricing">
+
+<section class="sc-pricing">
+    <div class="sc-pricing__header">
+        <span class="sc-label">PRICING</span>
+        <h2 class="sc-title">Choose Your Edge</h2>
+        <p class="sc-subtitle">Start with a recipe that prints.</p>
+    </div>
+
+    <div class="sc-pricing__grid">
+        {# Starter #}
+        <div class="sc-pricing__card">
+            <div class="sc-pricing__card-inner">
+                <h3 class="sc-pricing__plan">Starter</h3>
+                <p class="sc-pricing__plan-desc">Perfect for testing the waters</p>
+                <div class="sc-pricing__price">
+                    <span class="sc-pricing__currency">$</span>
+                    <span class="sc-pricing__amount">100</span>
+                    <span class="sc-pricing__period">/month</span>
+                </div>
+                <ul class="sc-pricing__features">
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        3 active bots
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Basic signals
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Email alerts
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Community access
+                    </li>
+                </ul>
+                <a href="#" class="sc-pricing__btn sc-pricing__btn--ghost">Start Cooking</a>
+            </div>
+        </div>
+
+        {# Full Recipe #}
+        <div class="sc-pricing__card sc-pricing__card--featured">
+            <div class="sc-pricing__badge">RECOMMENDED</div>
+            <div class="sc-pricing__card-inner">
+                <h3 class="sc-pricing__plan">Full Recipe</h3>
+                <p class="sc-pricing__plan-desc">The complete trading arsenal</p>
+                <div class="sc-pricing__price">
+                    <span class="sc-pricing__currency">$</span>
+                    <span class="sc-pricing__amount">100,000</span>
+                    <span class="sc-pricing__period">lifetime</span>
+                </div>
+                <ul class="sc-pricing__features">
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        All 9 bots
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Full ATLAS AI
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Priority signals
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        API access
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Dedicated support
+                    </li>
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Lifetime updates
+                    </li>
+                </ul>
+                <a href="#" class="sc-pricing__btn sc-pricing__btn--primary">Get Full Access</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.sc-pricing {
+    padding: 120px 0 100px;
+}
+.sc-pricing__header {
+    text-align: center;
+    margin-bottom: 64px;
+}
+.sc-pricing__grid {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 28px;
+    max-width: 780px;
+    margin: 0 auto;
+}
+.sc-pricing__card {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.3s ease;
+    overflow: visible;
+}
+.sc-pricing__card:hover {
+    transform: translateY(-2px);
+}
+.sc-pricing__card-inner {
+    padding: 40px 32px;
+}
+
+/* Featured card — animated rotating border */
+.sc-pricing__card--featured {
+    transform: scale(1.04);
+    border: none;
+    background: none;
+    isolation: isolate;
+}
+.sc-pricing__card--featured::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: conic-gradient(from var(--sc-border-angle, 0deg), var(--cyan), #6366f1, var(--negative), var(--gold), var(--cyan));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: sc-rotate-border 4s linear infinite;
+    z-index: -1;
+}
+@property --sc-border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+@keyframes sc-rotate-border {
+    to { --sc-border-angle: 360deg; }
+}
+.sc-pricing__card--featured .sc-pricing__card-inner {
+    background: rgba(10,15,28,0.95);
+    border-radius: 20px;
+}
+.sc-pricing__card--featured:hover {
+    transform: scale(1.06);
+}
+.sc-pricing__card--featured .sc-pricing__amount {
+    color: var(--cyan);
+}
+
+.sc-pricing__badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 5px 18px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--cyan), #6366f1);
+    color: #fff;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+.sc-pricing__plan {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+.sc-pricing__plan-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+}
+.sc-pricing__price {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    margin-bottom: 32px;
+}
+.sc-pricing__currency {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+.sc-pricing__amount {
+    font-family: var(--font-mono);
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+    letter-spacing: -2px;
+}
+.sc-pricing__period {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-left: 4px;
+    font-family: var(--font-mono);
+}
+.sc-pricing__features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.sc-pricing__features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+.sc-pricing__features li svg {
+    flex-shrink: 0;
+}
+
+/* Buttons */
+.sc-pricing__btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+.sc-pricing__btn--ghost {
+    color: var(--text-primary);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+.sc-pricing__btn--ghost:hover {
+    border-color: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.04);
+}
+.sc-pricing__btn--primary {
+    color: #030508;
+    background: var(--cyan);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.25);
+}
+.sc-pricing__btn--primary:hover {
+    background: #33dfff;
+    box-shadow: 0 6px 30px rgba(0,212,255,0.35);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .sc-pricing__grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    .sc-pricing__card {
+        max-width: 400px;
+        width: 100%;
+    }
+    .sc-pricing__card--featured {
+        transform: scale(1);
+        order: -1;
+    }
+    .sc-pricing__card--featured:hover {
+        transform: scale(1.02);
+    }
+}
+</style>
+
+<script>
+(function() {
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.sc-pricing__card', {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: '.sc-pricing__grid',
+                start: 'top 85%',
+                once: true
+            }
+        });
+    }
+})();
+</script>
+
+</div>
+</div>
+
+
+{# ============================
+   5. STATS MARQUEE
+   ============================ #}
+<div class="showcase-section" id="marquee-v1">
+<div class="showcase-variant-wrapper" data-label="Marquee">
+
+<section class="sc-marquee">
+    <div class="sc-marquee__strip">
+        <div class="marquee-track sc-marquee__track">
+            <span class="sc-marquee__item">9 Bots Active</span>
+            <span class="sc-marquee__sep"></span>
+            <span class="sc-marquee__item">$1.2M+ Tracked Volume</span>
+            <span class="sc-marquee__sep"></span>
+            <span class="sc-marquee__item">147 Indicators</span>
+            <span class="sc-marquee__sep"></span>
+            <span class="sc-marquee__item">4 Exchanges</span>
+            <span class="sc-marquee__sep"></span>
+            <span class="sc-marquee__item">24/7 Autonomous</span>
+            <span class="sc-marquee__sep"></span>
+            <span class="sc-marquee__item">15-min Cycles</span>
+            <span class="sc-marquee__sep"></span>
+            <span class="sc-marquee__item">ATLAS AI Powered</span>
+            <span class="sc-marquee__sep"></span>
+        </div>
+    </div>
+</section>
+
+<style>
+.sc-marquee {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+.sc-marquee__strip {
+    border-top: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 18px 0;
+    overflow: hidden;
+}
+.sc-marquee__track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    white-space: nowrap;
+    animation: sc-marquee-scroll 30s linear infinite;
+    width: max-content;
+}
+@keyframes sc-marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.sc-marquee__item {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    padding: 0 24px;
+}
+.sc-marquee__sep {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    flex-shrink: 0;
+}
+</style>
+
+</div>
+</div>
+
+
+{# ============================
+   6. FOOTER
+   ============================ #}
+<div class="showcase-section" id="footer-v1">
+<div class="showcase-variant-wrapper" data-label="Footer">
+
+<section class="sc-footer-cta">
+    <div class="sc-footer-cta__inner">
+        <div class="sc-footer-cta__watermark">
+            <img src="/static/img/logo.png" alt="" aria-hidden="true">
+        </div>
+        <h2 class="sc-footer-cta__heading">
+            <span class="sc-footer-cta__line1">Stop Watching.</span>
+            <span class="sc-footer-cta__line2">Start Cooking.</span>
+        </h2>
+        <a href="#section-pricing" class="sc-footer-cta__btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Unlock the Recipe
+        </a>
+    </div>
+</section>
+
+<footer class="sc-footer">
+    <div class="sc-footer__top">
+        <div class="sc-footer__col sc-footer__brand">
+            <div class="sc-footer__logo-row">
+                <img src="/static/img/logo.png" alt="RatSignal" class="sc-footer__logo">
+                <span class="sc-footer__logo-text">RatSignal</span>
+            </div>
+            <p class="sc-footer__tagline">The market's best kept recipe. Autonomous trading for the serious player.</p>
+            <div class="sc-footer__socials">
+                <a href="#" class="sc-footer__social" aria-label="Twitter/X">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="#" class="sc-footer__social" aria-label="Telegram">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                </a>
+                <a href="#" class="sc-footer__social" aria-label="Discord">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1569 2.4189z"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="sc-footer__col">
+            <h4 class="sc-footer__col-title">Product</h4>
+            <ul class="sc-footer__links">
+                <li><a href="#section-pipeline">How it Works</a></li>
+                <li><a href="#section-strategies">Strategies</a></li>
+                <li><a href="#section-signals">Signals</a></li>
+                <li><a href="#section-pricing">Pricing</a></li>
+            </ul>
+        </div>
+
+        <div class="sc-footer__col">
+            <h4 class="sc-footer__col-title">Company</h4>
+            <ul class="sc-footer__links">
+                <li><a href="#">About</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+
+        <div class="sc-footer__col">
+            <h4 class="sc-footer__col-title">Legal</h4>
+            <ul class="sc-footer__links">
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Risk Disclosure</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="sc-footer__bottom">
+        <p class="sc-footer__copy">&copy; 2026 RatSignal. All rights reserved.</p>
+        <p class="sc-footer__disclaimer">Trading cryptocurrencies involves substantial risk of loss and is not suitable for every investor. Past performance does not guarantee future results. Only trade with capital you can afford to lose.</p>
+    </div>
+</footer>
+
+<style>
+/* CTA section */
+.sc-footer-cta {
+    padding: 120px 0 100px;
+    position: relative;
+    overflow: hidden;
+}
+.sc-footer-cta__inner {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+}
+.sc-footer-cta__watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+}
+.sc-footer-cta__watermark img {
+    width: 300px;
+    height: auto;
+    filter: grayscale(1);
+}
+.sc-footer-cta__heading {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 40px;
+}
+.sc-footer-cta__line1,
+.sc-footer-cta__line2 {
+    display: block;
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+}
+.sc-footer-cta__line1 {
+    color: var(--text-primary);
+}
+.sc-footer-cta__line2 {
+    color: var(--gold);
+    font-family: var(--font-serif);
+    font-style: italic;
+}
+.sc-footer-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    background: var(--cyan);
+    color: #030508;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 24px rgba(0,212,255,0.25);
+    position: relative;
+    z-index: 1;
+}
+.sc-footer-cta__btn:hover {
+    background: #33dfff;
+    box-shadow: 0 8px 40px rgba(0,212,255,0.35);
+    transform: translateY(-2px);
+}
+
+/* Footer proper */
+.sc-footer {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 60px 0 40px;
+}
+.sc-footer__top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.sc-footer__logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.sc-footer__logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+.sc-footer__logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.sc-footer__tagline {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 280px;
+    margin-bottom: 20px;
+}
+.sc-footer__socials {
+    display: flex;
+    gap: 12px;
+}
+.sc-footer__social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+.sc-footer__social:hover {
+    color: var(--cyan);
+    border-color: rgba(0,212,255,0.2);
+    background: rgba(0,212,255,0.06);
+}
+.sc-footer__col-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    font-family: var(--font-mono);
+}
+.sc-footer__links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.sc-footer__links a {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+.sc-footer__links a:hover {
+    color: var(--text-primary);
+}
+.sc-footer__bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.sc-footer__copy {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.sc-footer__disclaimer {
+    font-size: 12px;
+    color: rgba(100,115,150,0.4);
+    font-style: italic;
+    line-height: 1.5;
+    max-width: 640px;
+}
+
+@media (max-width: 768px) {
+    .sc-footer__top {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+    }
+    .sc-footer__brand {
+        grid-column: 1 / -1;
+    }
+}
+@media (max-width: 480px) {
+    .sc-footer__top {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+(function() {
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.sc-footer-cta__line1', {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.sc-footer-cta', start: 'top 80%', once: true }
+        });
+        gsap.from('.sc-footer-cta__line2', {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            delay: 0.15,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.sc-footer-cta', start: 'top 80%', once: true }
+        });
+        gsap.from('.sc-footer-cta__btn', {
+            y: 20,
+            opacity: 0,
+            duration: 0.7,
+            delay: 0.3,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.sc-footer-cta', start: 'top 80%', once: true }
+        });
+    }
+
+    /* Init marquee duplication if available */
+    if (typeof initMarquees === 'function') {
+        initMarquees();
+    }
+})();
+</script>
+
+</div>
+</div>

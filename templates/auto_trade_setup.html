@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Set up {{ display_name }} - RatSignal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg-dark: #0a1628;
+      --bg-card: #0f1f35;
+      --bg-card-hover: #162a45;
+      --accent-orange: #ff6b2b;
+      --accent-orange-glow: rgba(255, 107, 43, 0.3);
+      --accent-cyan: #06B6D4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.15);
+      --accent-yellow: #f0b429;
+      --accent-red: #ff4757;
+      --text-primary: #f0f0f5;
+      --text-secondary: #8888a0;
+      --text-muted: #55556a;
+      --border: #1a2d4a;
+      --gradient-rat: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-dark); color: var(--text-primary);
+      font-family: 'Inter', sans-serif; line-height: 1.55;
+    }
+    a { color: var(--accent-cyan); text-decoration: none; }
+    a:hover { color: var(--accent-orange); }
+
+    nav {
+      position: sticky; top: 0; z-index: 1000;
+      padding: 16px 48px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(10, 22, 40, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 22px;
+      color: var(--text-primary);
+    }
+    .nav-logo .signal { color: var(--accent-orange); }
+    .nav-logo img { height: 28px; width: auto; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--text-secondary); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover { color: var(--accent-orange); }
+
+    .container { max-width: 760px; margin: 0 auto; padding: 40px 24px 80px; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; margin-bottom: 18px;
+    }
+    .back-link:hover { color: var(--accent-orange); }
+
+    .page-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: var(--accent-orange); letter-spacing: 1px;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(255, 107, 43, 0.1);
+      border: 1px solid rgba(255, 107, 43, 0.3);
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 700;
+      margin-bottom: 8px; letter-spacing: -0.5px;
+    }
+    h1 .accent { color: var(--accent-orange); }
+    .lead { color: var(--text-secondary); margin-bottom: 32px; font-size: 15px; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+    .card h3 {
+      font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 600;
+      color: var(--accent-cyan); margin-bottom: 18px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    label {
+      display: block; margin: 14px 0 6px;
+      font-weight: 500; color: var(--text-primary); font-size: 14px;
+    }
+    label.inline {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; margin: 12px 0;
+    }
+    label.inline input { width: auto; }
+    input, select {
+      width: 100%; padding: 11px 14px; box-sizing: border-box;
+      background: var(--bg-dark); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace; font-size: 14px;
+      transition: border-color .2s;
+    }
+    input:focus, select:focus {
+      outline: none; border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px var(--accent-cyan-glow);
+    }
+    input[type=checkbox] { width: 16px; height: 16px; padding: 0; cursor: pointer; }
+
+    .small {
+      font-size: 12px; color: var(--text-muted); margin-top: 6px;
+    }
+    .row { display: grid; gap: 14px; }
+    @media (min-width: 640px) { .row.cols-2 { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 640px) { .row.cols-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .alert {
+      padding: 12px 16px; border-radius: 8px; margin: 12px 0; font-size: 13px;
+      border-left: 3px solid;
+    }
+    .alert-warning {
+      background: rgba(240, 180, 41, 0.08); color: var(--text-secondary);
+      border-color: var(--accent-yellow);
+    }
+    .alert-warning strong { color: var(--accent-yellow); }
+    .alert-info {
+      background: rgba(6, 182, 212, 0.06); color: var(--text-secondary);
+      border-color: var(--accent-cyan);
+    }
+    .alert-info strong { color: var(--accent-cyan); }
+    .alert-error {
+      background: rgba(255, 71, 87, 0.08); color: var(--text-secondary);
+      border-color: var(--accent-red);
+    }
+    .alert-error strong { color: var(--accent-red); }
+    .alert-success {
+      background: rgba(0, 230, 118, 0.08); color: var(--text-secondary);
+      border-color: #00e676;
+    }
+    .alert-success strong { color: #00e676; }
+
+    .actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+      text-decoration: none; cursor: pointer;
+      border: 1px solid transparent; transition: all .2s;
+    }
+    .btn-primary { background: var(--gradient-rat); color: white !important; }
+    .btn-primary:hover {
+      transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-orange-glow);
+    }
+    .btn-secondary { background: transparent; border-color: var(--border); color: var(--text-primary) !important; }
+    .btn-secondary:hover { background: var(--bg-card-hover); border-color: var(--accent-cyan); }
+
+    #status:not(:empty) { margin-top: 18px; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">
+      <img src="/static/rat_logo.png" alt="RatSignal" onerror="this.style.display='none'">
+      Rat<span class="signal">Signal</span>
+    </a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="{{ url_for('auth.dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('auth.auto_trade') }}" style="color: var(--accent-orange);">Auto-Trading</a>
+      <a href="{{ url_for('auth.profile') }}">Profile</a>
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="{{ url_for('auth.auto_trade') }}" class="back-link">&larr; back to Auto-Trading</a>
+
+    <div class="page-tag">// SETUP</div>
+    <h1>Set up <span class="accent">{{ display_name }}</span></h1>
+    <p class="lead">Configure your exchange API key and trading parameters. We validate the key on save.</p>
+
+    <form id="setupForm" onsubmit="return false;">
+
+      <div class="card">
+        <h3>1. Exchange</h3>
+        <label>Where do you want to trade?</label>
+        <select id="exchange" onchange="onExchangeChange()">
+          <option value="lighter" {% if config.exchange == 'lighter' or not config.exchange %}selected{% endif %}>Lighter (recommended)</option>
+          <option value="binance" {% if config.exchange == 'binance' %}selected{% endif %}>Binance Futures</option>
+        </select>
+
+        <div id="lighterFields">
+          <label>Lighter API Private Key</label>
+          <input type="password" id="lighter_key" placeholder="0x...">
+
+          <div class="row cols-2" style="margin-top: 8px;">
+            <div>
+              <label>API Key Index</label>
+              <input type="number" id="lighter_idx" value="{{ config.api_key_index or 4 }}">
+            </div>
+            <div>
+              <label>Sub-Account Index</label>
+              <input type="text" id="lighter_acct" value="{{ config.account_index or '' }}">
+            </div>
+          </div>
+
+          {% if bot == 'quickbite' %}
+          <div class="alert alert-info">
+            <strong>Quick Bite tip:</strong> use a SEPARATE Lighter sub-account
+            from your Slipstream bot. This keeps PnL clean and avoids position
+            interference.
+          </div>
+          {% endif %}
+          <div class="alert alert-warning">
+            <strong>Trading-only key.</strong> Do not enable withdraw permission
+            on the API key.
+          </div>
+        </div>
+
+        <div id="binanceFields" style="display: none;">
+          <label>Binance API Key</label>
+          <input type="password" id="binance_key">
+
+          <label>Binance API Secret</label>
+          <input type="password" id="binance_secret">
+
+          <div class="alert alert-warning">
+            <strong>Withdraw permission must be DISABLED.</strong> We verify
+            this on the exchange when you save.
+          </div>
+          {% if bot == 'quickbite' %}
+          <div class="alert alert-warning">
+            If you also run Slipstream on this same Binance account, positions
+            from both bots will mix in your Binance Futures wallet. We can
+            still attribute PnL per bot in your dashboard, but the Binance UI
+            will show one combined position list.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. Position sizing</h3>
+        <label>Sizing mode</label>
+        <select id="sizing_mode" onchange="onSizingChange()">
+          <option value="fixed" {% if config.sizing_mode != 'percent' %}selected{% endif %}>Fixed USD per trade</option>
+          <option value="percent" {% if config.sizing_mode == 'percent' %}selected{% endif %}>Percent of account balance</option>
+        </select>
+
+        <div id="fixedSize">
+          <label>USD per trade</label>
+          <input type="number" step="0.01" id="position_size_usd" value="{{ config.position_size_usd or 20 }}">
+        </div>
+        <div id="percentSize" style="display:none;">
+          <label>% of balance per trade</label>
+          <input type="number" step="0.01" id="position_size_pct" value="{{ config.position_size_pct or 2 }}">
+        </div>
+        <p class="small">Changing this only affects new trades, not existing open positions.</p>
+      </div>
+
+      <div class="card">
+        <h3>3. Leverage</h3>
+        <div class="row cols-2">
+          <div>
+            <label>Default leverage</label>
+            <input type="number" id="leverage" value="{{ config.leverage or 3 }}">
+          </div>
+          <div>
+            <label>Max leverage</label>
+            <input type="number" id="max_leverage" value="{{ config.max_leverage or 5 }}">
+          </div>
+        </div>
+        <label class="inline">
+          <input type="checkbox" id="copy_leverage" {% if config.copy_leverage %}checked{% endif %}>
+          <span>Copy bot's leverage exactly (capped at max above)</span>
+        </label>
+      </div>
+
+      <div class="card">
+        <h3>4. Risk limits</h3>
+        <div class="row cols-3">
+          <div>
+            <label>Max open positions</label>
+            <input type="number" id="max_total_positions" value="{{ config.max_total_positions or 0 }}">
+            <p class="small">0 = no limit</p>
+          </div>
+          <div>
+            <label>Max loss per trade (%)</label>
+            <input type="number" step="0.1" id="max_loss_pct" value="{{ config.max_loss_pct or 15 }}">
+          </div>
+          <div>
+            <label>Max hold (hours)</label>
+            <input type="number" id="max_hold_hours" value="{{ config.max_hold_hours or 72 }}">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>5. Terms</h3>
+        <label class="inline">
+          <input type="checkbox" id="tos">
+          <span>I have read and accept the
+            <a href="/legal/hosted-tos" target="_blank">Hosted Trading Terms &amp; Disclaimer</a>
+          </span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" onclick="submitForm()">Validate &amp; Save</button>
+        <a class="btn btn-secondary" href="{{ url_for('auth.auto_trade') }}">Cancel</a>
+      </div>
+    </form>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    function onExchangeChange() {
+      const ex = document.getElementById('exchange').value;
+      document.getElementById('lighterFields').style.display = ex === 'lighter' ? 'block' : 'none';
+      document.getElementById('binanceFields').style.display = ex === 'binance' ? 'block' : 'none';
+    }
+    function onSizingChange() {
+      const m = document.getElementById('sizing_mode').value;
+      document.getElementById('fixedSize').style.display = m === 'fixed' ? 'block' : 'none';
+      document.getElementById('percentSize').style.display = m === 'percent' ? 'block' : 'none';
+    }
+    onExchangeChange(); onSizingChange();
+
+    async function submitForm() {
+      const status = document.getElementById('status');
+      const ex = document.getElementById('exchange').value;
+      const body = {
+        exchange: ex,
+        sizing_mode: document.getElementById('sizing_mode').value,
+        position_size_usd: document.getElementById('position_size_usd').value,
+        position_size_pct: document.getElementById('position_size_pct').value,
+        leverage: document.getElementById('leverage').value,
+        copy_leverage: document.getElementById('copy_leverage').checked,
+        max_leverage: document.getElementById('max_leverage').value,
+        max_total_positions: document.getElementById('max_total_positions').value,
+        max_loss_pct: document.getElementById('max_loss_pct').value,
+        max_hold_hours: document.getElementById('max_hold_hours').value,
+        tos_accepted: document.getElementById('tos').checked,
+      };
+      if (ex === 'lighter') {
+        body.api_key = document.getElementById('lighter_key').value;
+        body.api_key_index = document.getElementById('lighter_idx').value;
+        body.account_index = document.getElementById('lighter_acct').value;
+      } else {
+        body.api_key = document.getElementById('binance_key').value;
+        body.api_secret = document.getElementById('binance_secret').value;
+      }
+      status.innerHTML = '<div class="alert alert-info"><strong>Validating</strong> API key on the exchange... please wait.</div>';
+      try {
+        const res = await fetch(`/api/hosted/{{ bot }}/save`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          status.innerHTML = '<div class="alert alert-success"><strong>Saved.</strong> Your key was validated. Redirecting...</div>';
+          setTimeout(() => window.location = "{{ url_for('auth.auto_trade') }}", 1500);
+        } else {
+          status.innerHTML = '<div class="alert alert-error"><strong>Save failed:</strong> ' + data.error + '</div>';
+        }
+      } catch (e) {
+        status.innerHTML = '<div class="alert alert-error"><strong>Network error:</strong> ' + e + '</div>';
+      }
+    }
+  </script>
+</body>
+</html>

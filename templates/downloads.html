@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatSignal | Downloads</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #e5e7eb;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 32px;
+            background: rgba(10,10,15,0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-logo { font-weight: 800; font-size: 1.3rem; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .nav-logo .signal { color: #ff6b2b; }
+        .rat-icon { height: 28px; width: auto; vertical-align: middle; }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { color: #9ca3af; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #ff6b2b; }
+        .nav-signin { color: #fff !important; }
+        .nav-cta { background: #ff6b2b; color: #fff !important; padding: 8px 16px; border-radius: 8px; font-weight: 600; }
+
+        .page-hero { text-align: center; padding: 70px 24px 30px; max-width: 900px; margin: 0 auto; }
+        .page-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b2b 0%, #ffa500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        .page-hero p { font-size: 1.05rem; color: #9ca3af; max-width: 720px; margin: 0 auto; }
+
+        .wrapper { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+
+        /* Featured (Launcher) card — big, single column */
+        .feature-card {
+            background: linear-gradient(180deg, rgba(255,107,43,0.10) 0%, rgba(255,107,43,0.02) 100%);
+            border: 2px solid rgba(255,107,43,0.5);
+            border-radius: 20px;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 36px;
+            position: relative;
+        }
+        .feature-card::before {
+            content: 'RECOMMENDED';
+            position: absolute; top: -14px; left: 30px;
+            background: #ff6b2b; color: #fff;
+            padding: 5px 14px; border-radius: 14px;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px;
+        }
+        .feature-name { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+        .feature-tagline { font-size: 1rem; color: #d1d5db; margin-bottom: 14px; }
+        .feature-list { list-style: none; padding: 0; margin: 0 0 18px 0; }
+        .feature-list li {
+            padding: 5px 0 5px 22px; position: relative; font-size: 0.92rem; color: #e5e7eb;
+        }
+        .feature-list li::before {
+            content: '✓'; position: absolute; left: 0;
+            color: #4ade80; font-weight: 700;
+        }
+        .feature-btn {
+            background: #ff6b2b; color: #fff !important;
+            padding: 16px 28px; border-radius: 12px;
+            font-weight: 700; font-size: 1rem;
+            display: inline-flex; align-items: center; gap: 10px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .feature-btn:hover { background: #ff7f4c; }
+        .feature-meta { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 8px; }
+
+        /* Power user section — small ZIP cards */
+        .section-title {
+            font-size: 1rem; font-weight: 700;
+            color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;
+            margin: 30px 0 12px 0;
+        }
+        .pkg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .pkg-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex; flex-direction: column;
+        }
+        .pkg-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px; }
+        .pkg-name { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .pkg-tagline { font-size: 0.82rem; color: #9ca3af; margin-bottom: 14px; flex-grow: 1; }
+        .pkg-btn {
+            background: #1f2937; color: #e5e7eb !important;
+            padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+            text-align: center; border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.15s;
+        }
+        .pkg-btn:hover { background: #374151; }
+        .pkg-btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+        .pkg-size { font-size: 0.72rem; color: #6b7280; text-align: center; margin-top: 8px; }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.06);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 16px 22px;
+            margin: 30px auto 0;
+            max-width: 880px;
+            color: #bfdbfe;
+            font-size: 0.92rem;
+        }
+        .info-box strong { color: #fff; }
+
+        footer {
+            text-align: center; padding: 36px 24px; color: #6b7280; font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px;
+        }
+        footer a { color: #9ca3af; }
+        footer a:hover { color: #fff; }
+        @media (max-width: 720px) {
+            .feature-card { grid-template-columns: 1fr; text-align: center; }
+            .nav-links { gap: 12px; }
+            .nav-links a:not(.nav-signin):not(.nav-cta) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-logo">
+        <img src="/static/rat_logo.png" alt="RatSignal" class="rat-icon">
+        Rat<span class="signal">Signal</span>
+    </a>
+    <div class="nav-links">
+        <a href="/#signals">Signals</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/downloads" class="active">Downloads</a>
+        <a href="/auth/login" class="nav-signin">Sign in</a>
+        <a href="/auth/register" class="nav-cta">Get started</a>
+    </div>
+</nav>
+
+<section class="page-hero">
+    <h1>One click and you mirror RatSignal</h1>
+    <p>Download the RatSignal Launcher, sign in with the same email and password you use on this site, and you are done. The app receives every trade we make on our Lighter accounts and replicates it on your own exchange — automatically, in real time.</p>
+</section>
+
+<div class="wrapper">
+
+    <!-- FEATURED: Launcher (.exe) -->
+    <div class="feature-card">
+        <div>
+            <div class="feature-name">RatSignal Launcher</div>
+            <div class="feature-tagline">Windows app · no install, no Python, no terminal</div>
+            <ul class="feature-list">
+                <li><strong>Sign in once</strong> with your RatSignal email + password — no token to copy/paste</li>
+                <li><strong>One screen</strong> for exchange selection (Lighter or Binance), trade size and leverage</li>
+                <li><strong>Live status:</strong> see every signal as it arrives, plus your own trade outcomes</li>
+                <li>Auto-stops if your subscription lapses (server-side check every 5 minutes)</li>
+                <li>Your exchange API keys stay on your machine — only you ever see them</li>
+            </ul>
+            <a href="/download/launcher.exe" class="feature-btn">↓ Download Launcher (.exe)</a>
+            <div class="feature-meta">Single file · Windows 10/11 · ~30 MB</div>
+        </div>
+    </div>
+
+    <!-- POWER-USER ZIPs -->
+    <div class="section-title">Advanced — Python source (for VPS / Linux / macOS / customisation)</div>
+    <div class="pkg-grid">
+        <div class="pkg-card">
+            <div class="pkg-label">Python · Slipstream</div>
+            <div class="pkg-name">Mirror — Slipstream signals</div>
+            <div class="pkg-tagline">Receive Slipstream open/close events over WSS and place trades on your account. Includes a token-login helper script.</div>
+            <a href="/download/slipstream.zip" class="pkg-btn">Download Slipstream</a>
+            <div class="pkg-size">ZIP · ~70 KB · Python 3.10+</div>
+        </div>
+        <div class="pkg-card">
+            <div class="pkg-label">Python · Quick Bite</div>
+            <div class="pkg-name">Mirror — Quick Bite signals</div>
+            <div class="pkg-tagline">Same WSS client, scoped to Quick Bite SHORT signals only.</div>
+            <a href="/download/quickbite.zip" class="pkg-btn">Download Quick Bite</a>
+            <div class="pkg-size">ZIP · ~70 KB · Python 3.10+</div>
+        </div>
+        <div class="pkg-card">
+            <div class="pkg-label">Python · Duo</div>
+            <div class="pkg-name">Mirror — both bots</div>
+            <div class="pkg-tagline">Receives every RatSignal trade signal across both bots.</div>
+            <a href="/download/duo.zip" class="pkg-btn">Download Duo</a>
+            <div class="pkg-size">ZIP · ~140 KB · Python 3.10+</div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <strong>How v2 protects everything.</strong> The signals never come from a public source any more — they are pushed from our broadcaster only to clients with a valid bot token tied to an active RatSignal subscription. The strategy, ML model and wallet list stay on our servers. Your exchange API keys stay on your machine. We only see whether you have a paid subscription.
+    </div>
+
+</div>
+
+<footer>
+    <p>&copy; RatSignal. Built for crypto traders who want the work done for them.</p>
+    <p style="margin-top:6px;"><a href="/">Home</a> &middot; <a href="/#pricing">Pricing</a> &middot; <a href="/auth/login">Sign in</a></p>
+</footer>
+
+</body>
+</html>

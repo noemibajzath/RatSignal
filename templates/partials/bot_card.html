@@ -1,0 +1,29 @@
+{# Bot card macro — reusable Jinja2 partial for a single account card #}
+{% macro bot_card(acct) %}
+<div class="position-entry {{ 'atlas-entry' if acct.id == 9 else '' }} {{ 'waiting' if acct.status == 'waiting' else '' }} {{ 'positive' if acct.total_pnl >= 0 else 'negative' }}"
+     id="card-{{ acct.id }}" onclick="toggleDetail({{ acct.id }})">
+    <div class="position-header">
+        <span class="position-name">{{ acct.display_name }}</span>
+        <span class="position-status {{ acct.status }}">{{ acct.status }}</span>
+    </div>
+    <div class="position-pnl">
+        <span class="pnl-value {{ 'positive' if acct.total_pnl >= 0 else 'negative' }}">
+            {{ '+' if acct.total_pnl >= 0 else '' }}${{ '%.2f'|format(acct.total_pnl) }}
+        </span>
+        {% if acct.balance > 0 %}
+        <span class="pnl-pct {{ 'positive' if acct.total_pnl >= 0 else 'negative' }}">
+            {{ '%.1f'|format(acct.total_pnl / acct.balance * 100) }}%
+        </span>
+        {% endif %}
+    </div>
+    <div class="position-meta">
+        <span>{{ acct.total_trades }} trades</span>
+        <span>{{ '%.1f'|format(acct.win_rate) }}% WR</span>
+        <span>${{ '%.0f'|format(acct.balance) }}</span>
+    </div>
+    {% if acct.equity_curve and acct.equity_curve|length > 1 %}
+    <canvas class="sparkline-canvas" data-sparkline='{{ acct.equity_curve|tojson }}'
+            width="200" height="40"></canvas>
+    {% endif %}
+</div>
+{% endmacro %}

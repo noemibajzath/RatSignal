@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pay with Wallet - RatSignal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a1628;color:#f0f0f5;font-family:'Inter',sans-serif;min-height:100vh;padding:40px 20px}
+    .container{max-width:640px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,107,43,0.2);border-radius:14px;padding:36px}
+    h1{font-family:'Orbitron',sans-serif;font-size:1.6rem;margin-bottom:6px;background:linear-gradient(135deg,#ff6b2b,#ff8f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .subtitle{color:#8888a0;font-size:0.9rem;margin-bottom:28px}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+    .row:last-child{border-bottom:none}
+    .label{color:#8888a0;font-size:0.85rem}
+    .value{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:#f0f0f5;word-break:break-all;text-align:right}
+    .amount{font-size:1.3rem;font-weight:700;color:#06B6D4}
+    .chip{display:inline-block;padding:3px 10px;background:rgba(255,107,43,0.15);color:#ff6b2b;border-radius:6px;font-size:0.75rem;font-weight:600;margin-left:8px;text-transform:uppercase}
+    .address-box{background:rgba(0,0,0,0.3);border:1px dashed rgba(255,107,43,0.3);border-radius:8px;padding:14px;margin:20px 0;display:flex;align-items:center;gap:10px}
+    .address-box code{flex:1;font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:#f0f0f5;word-break:break-all}
+    .copy-btn{background:transparent;border:1px solid #06B6D4;color:#06B6D4;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.78rem;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+    .copy-btn:hover{background:rgba(6,182,212,0.1)}
+    .disconnect-row{display:none;justify-content:flex-end;margin-top:10px}
+    .disconnect-row.visible{display:flex}
+    .disconnect-btn{background:transparent;border:none;color:#8888a0;padding:4px 8px;cursor:pointer;font-size:0.72rem;font-family:'JetBrains Mono',monospace;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+    .disconnect-btn:hover{color:#ff4757}
+    .btn-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+    .btn{flex:1;min-width:200px;padding:14px 22px;border:none;border-radius:10px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:transform 0.1s,opacity 0.2s}
+    .btn-primary{background:linear-gradient(135deg,#ff6b2b,#ff8f5e);color:white;box-shadow:0 4px 20px rgba(255,107,43,0.3)}
+    .btn-primary:hover:not(:disabled){transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+    .btn-secondary{background:transparent;border:1px solid #06B6D4;color:#06B6D4}
+    .btn-secondary:hover{background:rgba(6,182,212,0.1)}
+    .btn-connect{background:linear-gradient(135deg,#06B6D4,#3dd4e8);color:white;box-shadow:0 4px 24px rgba(6,182,212,0.4);border:none;position:relative;overflow:hidden}
+    .btn-connect:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 30px rgba(6,182,212,0.55)}
+    .btn-connect.connected{background:linear-gradient(135deg,#00e676,#4ade80);box-shadow:0 4px 24px rgba(0,230,118,0.4)}
+    .btn-pay-pending{opacity:0.5}
+    .connect-section{margin-top:24px;padding:20px;background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.25);border-radius:12px}
+    .connect-section .step-label{font-size:0.72rem;color:#06B6D4;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-weight:600}
+    .connect-section .step-title{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:#f0f0f5;margin-bottom:6px}
+    .connect-section .step-desc{font-size:0.85rem;color:#8888a0;margin-bottom:16px;line-height:1.5}
+    .connect-buttons{display:flex;gap:10px;flex-wrap:wrap}
+    .connect-buttons .btn{flex:1;min-width:200px}
+    .status-box{margin-top:24px;padding:16px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.25);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:#06B6D4}
+    .status-box.success{background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.3);color:#00e676}
+    .status-box.error{background:rgba(255,71,87,0.08);border-color:rgba(255,71,87,0.3);color:#ff4757}
+    .tx-link{color:#06B6D4;text-decoration:none;border-bottom:1px dotted #06B6D4}
+    .tx-link:hover{color:#33d4e8}
+    .help-text{color:#8888a0;font-size:0.8rem;margin-top:20px;line-height:1.6}
+    .refund-note{margin:0 0 22px;padding:12px 16px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.25);border-left:3px solid #00e676;border-radius:8px;color:#8888a0;font-size:0.82rem;line-height:1.55}
+    .refund-note strong{color:#00e676;font-weight:600}
+    .back-link{display:inline-block;margin-top:24px;color:#8888a0;text-decoration:none;font-size:0.85rem;border-bottom:1px dotted #8888a0}
+    .back-link:hover{color:#f0f0f5}
+    .wallet-icons{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px;color:#8888a0;font-size:0.78rem}
+    .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(6,182,212,0.3);border-top-color:#06B6D4;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pay with Wallet</h1>
+    <div class="subtitle">{{ plan|capitalize }} plan - ${{ price_amount }}</div>
+
+    <div class="refund-note">
+      <strong>7-day money-back guarantee.</strong> Cancel within 7 days and we refund the full amount to this wallet within 24 hours.
+    </div>
+
+    <div class="row">
+      <span class="label">Amount to send</span>
+      <span class="value amount">{{ pay_amount }} {{ pay_currency|upper }}<span class="chip">{{ network }}</span></span>
+    </div>
+    <div class="row">
+      <span class="label">Order ID</span>
+      <span class="value">{{ order_id }}</span>
+    </div>
+
+    <div class="address-box">
+      <code id="pay-address">{{ pay_address }}</code>
+      <button class="copy-btn" onclick="copyAddress()">Copy</button>
+    </div>
+
+    <div class="connect-section">
+      <div class="step-label">Step 1 · Connect</div>
+      <div class="step-title">Connect your wallet to pay instantly</div>
+      <div class="step-desc">One click connects MetaMask, Rabby, Phantom, Coinbase, Trust, Brave, OKX, or scan the QR with any mobile wallet via WalletConnect (Rainbow, Zerion, Argent, Safe, Ledger Live).</div>
+      <div class="connect-buttons">
+        <button id="connect-btn" class="btn btn-connect">Connect Browser Wallet</button>
+        {% if wc_project_id %}
+        <button id="wc-btn" class="btn btn-secondary">WalletConnect (QR)</button>
+        {% endif %}
+      </div>
+      <div id="disconnect-row" class="disconnect-row">
+        <button id="disconnect-btn" class="disconnect-btn" type="button">Disconnect wallet</button>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:16px;">
+      <button id="pay-btn" class="btn btn-primary btn-pay-pending" disabled>Step 2 · Pay {{ pay_amount }} {{ pay_currency|upper }}</button>
+    </div>
+    <div class="wallet-icons">MetaMask · Rabby · Coinbase · Trust · Brave · OKX{% if wc_project_id %} · Rainbow · Zerion · Argent · Safe · Ledger Live (via WalletConnect){% endif %}</div>
+
+    <div id="status-box" class="status-box"><span class="spinner"></span>Waiting for you to send the payment...</div>
+
+    <div class="help-text">
+      <strong>No wallet extension?</strong> Open this page in your wallet's in-app browser, or send manually from any wallet/exchange. Send the <strong>exact amount</strong> of <strong>{{ pay_currency|upper }}</strong> to the address above on the <strong>{{ network }}</strong> network. Sending on the wrong network means the funds will be lost.
+    </div>
+
+    <a href="/auth/profile" class="back-link">← Back to profile</a>
+  </div>
+
+  <script>
+    const PAYMENT_ID    = {{ payment_id|tojson }};
+    const PAY_ADDRESS   = {{ pay_address|tojson }};
+    const PAY_AMOUNT    = {{ pay_amount|tojson }};
+    const PAY_CURRENCY  = {{ pay_currency|tojson }};
+    const WC_PROJECT_ID = {{ (wc_project_id or '')|tojson }};
+
+    // Chain + token config resolved server-side from NOWPayments /full-currencies
+    // and our EVM_NETWORKS map. If chainCfg is null, the currency isn't
+    // auto-payable in-browser (e.g. BTC, SOL) - we fall back to manual-send.
+    const chainCfg = {{ (chain_config or None)|tojson }};
+    const TOKEN_CONTRACT = {{ (token_contract or None)|tojson }};
+    const TOKEN_DECIMALS = {{ (token_decimals if token_decimals is not none else 18)|tojson }};
+    const EXPLORER_TX_BASE = {{ (explorer_tx_base or '')|tojson }};
+    if (chainCfg) {
+      chainCfg.explorerTxBase = EXPLORER_TX_BASE || (chainCfg.blockExplorerUrls[0] + "/tx/");
+      chainCfg.token = TOKEN_CONTRACT;          // null for native coins
+      chainCfg.decimals = TOKEN_DECIMALS;
+    }
+
+    function statusBox(msg, cls) {
+      const el = document.getElementById('status-box');
+      el.className = 'status-box' + (cls ? ' ' + cls : '');
+      el.innerHTML = msg;
+    }
+
+    function copyAddress() {
+      navigator.clipboard.writeText(PAY_ADDRESS);
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    }
+    window.copyAddress = copyAddress;
+
+    function toRawAmount(amountStr, decimals) {
+      const [intPart, decPart = ""] = String(amountStr).split(".");
+      const padded = (decPart + "0".repeat(decimals)).slice(0, decimals);
+      const combined = ((intPart || "0") + padded).replace(/^0+/, "") || "0";
+      return BigInt(combined);
+    }
+
+    async function ensureChain() {
+      const current = await window.ethereum.request({ method: 'eth_chainId' });
+      if (current === chainCfg.chainIdHex) return;
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainCfg.chainIdHex }],
+        });
+      } catch (e) {
+        if (e.code === 4902 || (e.data && e.data.originalError && e.data.originalError.code === 4902)) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: chainCfg.chainIdHex,
+              chainName: chainCfg.chainName,
+              nativeCurrency: chainCfg.nativeCurrency,
+              rpcUrls: chainCfg.rpcUrls,
+              blockExplorerUrls: chainCfg.blockExplorerUrls,
+            }],
+          });
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    // Active provider - either window.ethereum (browser extension) or a WalletConnect provider.
+    let currentProvider = null;
+    let wcProvider = null;
+
+    async function ensureChain(provider) {
+      const current = await provider.request({ method: 'eth_chainId' });
+      if (current === chainCfg.chainIdHex) return;
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainCfg.chainIdHex }],
+        });
+      } catch (e) {
+        if (e.code === 4902 || (e.data && e.data.originalError && e.data.originalError.code === 4902)) {
+          await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: chainCfg.chainIdHex,
+              chainName: chainCfg.chainName,
+              nativeCurrency: chainCfg.nativeCurrency,
+              rpcUrls: chainCfg.rpcUrls,
+              blockExplorerUrls: chainCfg.blockExplorerUrls,
+            }],
+          });
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    function markConnected(addr, label) {
+      const connectBtn = document.getElementById('connect-btn');
+      connectBtn.textContent = '✓ ' + (label ? label + ' ' : '') + addr.slice(0, 6) + '…' + addr.slice(-4);
+      connectBtn.classList.add('connected');
+      connectBtn.disabled = true;
+      const wcBtn = document.getElementById('wc-btn');
+      if (wcBtn) wcBtn.style.display = 'none';
+      const payBtn = document.getElementById('pay-btn');
+      payBtn.disabled = false;
+      payBtn.classList.remove('btn-pay-pending');
+      document.getElementById('disconnect-row').classList.add('visible');
+      statusBox('Wallet connected. Click <strong>Pay</strong> to complete.', '');
+    }
+
+    async function disconnectWallet() {
+      // Tear down the WalletConnect session if one is active.
+      if (wcProvider) {
+        try { await wcProvider.disconnect(); } catch (e) { /* ignore */ }
+        wcProvider = null;
+      }
+      // For browser extensions, try EIP-2255 revoke - silently no-op where unsupported.
+      if (currentProvider && currentProvider === window.ethereum) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_revokePermissions',
+            params: [{ eth_accounts: {} }],
+          });
+        } catch (e) { /* most wallets don't support this yet */ }
+      }
+      currentProvider = null;
+
+      // Reset UI back to pre-connect state.
+      const connectBtn = document.getElementById('connect-btn');
+      connectBtn.textContent = 'Connect Browser Wallet';
+      connectBtn.classList.remove('connected');
+      connectBtn.disabled = false;
+      const wcBtn = document.getElementById('wc-btn');
+      if (wcBtn) wcBtn.style.display = '';
+      const payBtn = document.getElementById('pay-btn');
+      payBtn.disabled = true;
+      payBtn.classList.add('btn-pay-pending');
+      document.getElementById('disconnect-row').classList.remove('visible');
+      statusBox('<span class="spinner"></span>Waiting for you to send the payment...', '');
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        statusBox('No browser wallet detected. Use WalletConnect (QR) instead, or send manually to the address above.', 'error');
+        return;
+      }
+      if (!chainCfg) {
+        statusBox('Automatic wallet payment is not available for ' + PAY_CURRENCY.toUpperCase() + '. Please send manually.', 'error');
+        return;
+      }
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        currentProvider = window.ethereum;
+        markConnected(accounts[0]);
+      } catch (e) {
+        statusBox('Wallet connection rejected.', 'error');
+      }
+    }
+
+    async function connectWalletConnect() {
+      if (!WC_PROJECT_ID) { statusBox('WalletConnect is not configured.', 'error'); return; }
+      if (!chainCfg) { statusBox('Automatic wallet payment is not available for ' + PAY_CURRENCY.toUpperCase() + '.', 'error'); return; }
+      try {
+        statusBox('<span class="spinner"></span>Loading WalletConnect…', '');
+        const mod = await import('https://esm.sh/@walletconnect/ethereum-provider@2.17.2');
+        const EthereumProvider = mod.EthereumProvider || mod.default;
+        wcProvider = await EthereumProvider.init({
+          projectId: WC_PROJECT_ID,
+          chains: [parseInt(chainCfg.chainIdHex, 16)],
+          showQrModal: true,
+          metadata: {
+            name: 'RatSignal',
+            description: 'RatSignal subscription payment',
+            url: window.location.origin,
+            icons: [window.location.origin + '/favicon.ico']
+          },
+          qrModalOptions: {
+            themeMode: 'dark',
+            themeVariables: { '--wcm-accent-color': '#ff6b2b', '--wcm-background-color': '#0a1628' }
+          }
+        });
+        wcProvider.on('disconnect', () => { statusBox('WalletConnect disconnected.', 'error'); });
+        statusBox('<span class="spinner"></span>Scan the QR with your mobile wallet…', '');
+        await wcProvider.connect();
+        const accounts = await wcProvider.request({ method: 'eth_accounts' });
+        if (!accounts || !accounts[0]) { statusBox('WalletConnect: no account returned.', 'error'); return; }
+        currentProvider = wcProvider;
+        markConnected(accounts[0], 'WC');
+      } catch (e) {
+        console.error('WalletConnect error:', e);
+        statusBox('WalletConnect failed: ' + (e && e.message ? e.message : e), 'error');
+      }
+    }
+
+    async function payWithWallet() {
+      if (!chainCfg) return;
+      const provider = currentProvider;
+      if (!provider) { statusBox('Connect a wallet first.', 'error'); return; }
+      try {
+        statusBox('<span class="spinner"></span>Switching to ' + chainCfg.chainName + '…', '');
+        await ensureChain(provider);
+
+        statusBox('<span class="spinner"></span>Requesting wallet permission…', '');
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        const from = accounts && accounts[0];
+        if (!from) { statusBox('No account available in wallet.', 'error'); return; }
+
+        const rawAmount = toRawAmount(PAY_AMOUNT, chainCfg.decimals);
+        const txParams = { from };
+        if (chainCfg.token) {
+          // ERC-20 transfer(recipient, amount)
+          const addrPadded = PAY_ADDRESS.slice(2).toLowerCase().padStart(64, '0');
+          const amtPadded  = rawAmount.toString(16).padStart(64, '0');
+          txParams.to = chainCfg.token;
+          txParams.data = '0xa9059cbb' + addrPadded + amtPadded;
+          txParams.value = '0x0';
+        } else {
+          // Native coin transfer (ETH, MATIC, BNB, AVAX, …)
+          txParams.to = PAY_ADDRESS;
+          txParams.value = '0x' + rawAmount.toString(16);
+        }
+
+        statusBox('<span class="spinner"></span>Confirm the transaction in your wallet…', '');
+        const txHash = await provider.request({
+          method: 'eth_sendTransaction',
+          params: [txParams],
+        });
+
+        document.getElementById('pay-btn').disabled = true;
+        statusBox(
+          '<span class="spinner"></span>Transaction sent. Waiting for on-chain confirmation. ' +
+          '<a class="tx-link" target="_blank" href="' + chainCfg.explorerTxBase + txHash + '">View on explorer</a>',
+          ''
+        );
+      } catch (e) {
+        console.error('Payment error:', e, 'code=', e && e.code, 'data=', e && e.data);
+        const code = e && e.code;
+        const rawMsg = (e && e.message) ? e.message : String(e);
+        let friendly = rawMsg;
+        if (code === 4001) friendly = 'You rejected the transaction in the wallet.';
+        else if (code === 4100) friendly = 'Wallet permission not granted for this account. Unlock your wallet, select the correct account, then click Pay again.';
+        else if (code === 4902) friendly = 'Polygon network is not added to your wallet. Add it manually or approve the prompt.';
+        else if (code === -32002) friendly = 'A wallet request is already pending. Open your wallet extension and approve or dismiss it, then retry.';
+        else if (code === -32603) friendly = 'Wallet internal error. Try switching to Polygon manually in your wallet first, then click Pay.';
+        else if (/unauthorized/i.test(rawMsg)) friendly = 'Wallet returned Unauthorized. This usually means a second wallet extension is hijacking window.ethereum, or the connected account was revoked. Disable extra wallet extensions, refresh, and reconnect.';
+        statusBox('Error: ' + friendly + (code ? ' <span style="opacity:0.6">(code ' + code + ')</span>' : ''), 'error');
+      }
+    }
+
+    async function pollStatus() {
+      try {
+        const r = await fetch('/payments/payment-status/' + encodeURIComponent(PAYMENT_ID), { credentials: 'same-origin' });
+        if (r.ok) {
+          const j = await r.json();
+          const s = (j.status || '').toLowerCase();
+          if (s === 'finished' || s === 'completed' || s === 'confirmed') {
+            statusBox('Payment confirmed! Redirecting to your dashboard…', 'success');
+            setTimeout(() => { window.location.href = '/auth/dashboard'; }, 2500);
+            return;
+          }
+          if (s === 'partially_paid') {
+            statusBox('Partial payment detected. Send the remainder to complete.', 'error');
+          } else if (s === 'failed' || s === 'expired' || s === 'refunded') {
+            statusBox('Payment ' + s + '.', 'error');
+            return;
+          } else if (s === 'confirming' || s === 'sending' || s === 'waiting') {
+            statusBox('<span class="spinner"></span>Status: ' + s + '…', '');
+          }
+        }
+      } catch (e) { /* transient */ }
+      setTimeout(pollStatus, 5000);
+    }
+
+    document.getElementById('connect-btn').addEventListener('click', connectWallet);
+    document.getElementById('pay-btn').addEventListener('click', payWithWallet);
+    document.getElementById('disconnect-btn').addEventListener('click', disconnectWallet);
+    const wcBtn = document.getElementById('wc-btn');
+    if (wcBtn) wcBtn.addEventListener('click', connectWalletConnect);
+
+    if (!chainCfg) {
+      document.getElementById('connect-btn').disabled = true;
+      document.getElementById('pay-btn').disabled = true;
+      statusBox('Automatic wallet payment is not available for ' + PAY_CURRENCY.toUpperCase() + '. Send manually using the address above.', '');
+    }
+
+    pollStatus();
+  </script>
+</body>
+</html>

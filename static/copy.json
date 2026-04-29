@@ -1,0 +1,82 @@
+{
+  "hero": {
+    "headline": "The Market's best kept recipe.",
+    "subtitle": "Smarter signals. Machine learning. Profitable results.",
+    "cta_primary": "Unlock the Recipe",
+    "cta_secondary": "See How It Works"
+  },
+  "how_it_works": {
+    "section_title": "Our Secret Ingredients",
+    "subtitle": "From raw market data to precise trading signals — here's how we cook.",
+    "step_1": {
+      "title": "Scan",
+      "subtitle": "147+ indicators analyzed",
+      "description": "Every 15 minutes, our algorithms scan candlesticks, volume, momentum, divergence, and 143 more indicators across multiple pairs. Nothing escapes the kitchen."
+    },
+    "step_2": {
+      "title": "Analyze",
+      "subtitle": "ML models decide",
+      "description": "Trained on 5.2 million candles spanning 4+ years, our models separate noise from signal. They know when to cook — and when to stay out of the kitchen."
+    },
+    "step_3": {
+      "title": "Execute",
+      "subtitle": "9 bots trade live",
+      "description": "Nine autonomous strategies execute trades in real-time on the Lighter exchange. Each with its own recipe, its own edge, its own risk profile."
+    }
+  },
+  "stats": {
+    "candles": {"value": "5.2M+", "label": "15-min candles processed"},
+    "years": {"value": "4+", "label": "years of historical data"},
+    "indicators": {"value": "147+", "label": "indicators analyzed"},
+    "bots": {"value": "9", "label": "live trading bots"}
+  },
+  "signals": {
+    "section_title": "Fresh From the Kitchen",
+    "subtitle": "Real signals from our live bots. Updated in real-time."
+  },
+  "pricing": {
+    "section_title": "Choose Your Kitchen Pass",
+    "subtitle": "One subscription. Everything included.",
+    "monthly": {
+      "name": "Monthly Recipe",
+      "price": "$100",
+      "period": "/month",
+      "features": [
+        "First week free",
+        "$50 for the first month",
+        "All 9 trading bots",
+        "TradingView indicator",
+        "Premium signal group",
+        "2-month money-back guarantee"
+      ],
+      "cta": "Start Free Trial"
+    },
+    "lifetime": {
+      "name": "Master Chef",
+      "price": "$100,000",
+      "period": "one-time",
+      "features": [
+        "Everything in Monthly",
+        "Full model access",
+        "Priority support",
+        "Custom strategy consultation"
+      ],
+      "cta": "Contact Us"
+    },
+    "crypto_note": "Pay with USDC on Ethereum. Bitcoin also accepted."
+  },
+  "trust": {
+    "tagline": "We don't tell you when to buy or sell. We show you what the market is doing, so you can decide.",
+    "risk_disclaimer": "Trading involves risk. Past performance does not guarantee future results. Only trade with capital you can afford to lose."
+  },
+  "footer": {
+    "tagline": "Cooking signals since day one.",
+    "links": ["Strategies", "How It Works", "Pricing", "Dashboard", "Telegram"],
+    "copyright": "2026 RatSignal. All rights reserved."
+  },
+  "seo": {
+    "title": "RatSignal | The Market's Best Kept Recipe — Autonomous Crypto Trading Bots",
+    "description": "9 autonomous ML-powered trading bots. 147+ indicators. 5.2M candles analyzed. Live performance tracking. Start your free trial.",
+    "keywords": "crypto trading bot, automated trading, machine learning trading, crypto signals, trading indicators, Lighter exchange, algorithmic trading"
+  }
+}

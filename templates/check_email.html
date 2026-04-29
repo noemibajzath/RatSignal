@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatSignal | Verify Your Email</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/static/img/logo.png" type="image/png">
+    <style>
+        :root {
+            --bg-primary: #0a1628;
+            --bg-card: rgba(13, 19, 33, 0.75);
+            --orange: #ff6b2b;
+            --cyan: #00d4ff;
+            --text-primary: #e8eaf6;
+            --text-secondary: rgba(160, 170, 200, 0.7);
+            --glass-border: rgba(100, 120, 180, 0.12);
+            --radius: 16px;
+            --font: 'Inter', -apple-system, sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 15px; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .auth-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+        }
+        .auth-nav a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+        .auth-nav img { height: 28px; width: auto; }
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px;
+            width: 100%;
+            max-width: 460px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+        .icon-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 107, 43, 0.15);
+            border: 1px solid rgba(255, 107, 43, 0.35);
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .auth-card h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .auth-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+        .email-pill {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--orange);
+            background: rgba(255, 107, 43, 0.1);
+            border: 1px solid rgba(255, 107, 43, 0.25);
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        .hint {
+            font-size: 0.8rem;
+            color: rgba(160, 170, 200, 0.5);
+            margin-top: 18px;
+        }
+        .auth-footer {
+            margin-top: 24px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .auth-footer a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="auth-nav">
+    <a href="/">
+        <img src="/static/rat_logo.png" alt="RatSignal">
+        Rat<span style="color:#ff6b2b;margin-left:-2px;">Signal</span>
+    </a>
+</div>
+
+<div class="auth-card">
+    <div class="icon-wrap">&#9993;</div>
+    <h1>Check your email</h1>
+    <p>We've sent a verification link to:</p>
+    <div class="email-pill">{{ email }}</div>
+    <p>Click the <strong>Verify Email Address</strong> button in the email to finish creating your account. The link expires in 24 hours.</p>
+    <p class="hint">No email after a minute or two? Check your spam folder. The sender is <strong>ratsignalcrypto@gmail.com</strong>.</p>
+    <div class="auth-footer">
+        Wrong email? <a href="/auth/register">Register again</a> &middot; <a href="/auth/login">Sign in</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RatSignal · Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a1628;color:#f0f0f5;font-family:'Inter',sans-serif;min-height:100vh;padding:24px}
+  .container{max-width:1280px;margin:0 auto}
+  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+  h1{font-family:'Orbitron',sans-serif;font-size:1.7rem;background:linear-gradient(135deg,#ff6b2b,#ff8f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .subtitle{color:#8888a0;font-size:0.85rem;font-family:'JetBrains Mono',monospace}
+  .backlink{color:#06B6D4;text-decoration:none;font-size:0.85rem;border-bottom:1px dotted #06B6D4}
+  .backlink:hover{color:#33d4e8}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:28px}
+  .card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,107,43,0.18);border-radius:12px;padding:20px}
+  .card .label{color:#8888a0;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+  .card .value{font-family:'Orbitron',sans-serif;font-size:1.85rem;font-weight:700;color:#f0f0f5}
+  .card .sub{color:#55556a;font-size:0.8rem;margin-top:6px}
+  .card.accent-green{border-color:rgba(0,230,118,0.3)}
+  .card.accent-green .value{color:#00e676}
+  .card.accent-cyan{border-color:rgba(6,182,212,0.3)}
+  .card.accent-cyan .value{color:#06B6D4}
+  .card.accent-orange{border-color:rgba(255,107,43,0.45)}
+  .card.accent-orange .value{color:#ff6b2b}
+  .charts{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:28px}
+  @media (max-width: 900px){.charts{grid-template-columns:1fr}}
+  .panel{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px}
+  .panel h2{font-family:'Orbitron',sans-serif;font-size:0.95rem;color:#f0f0f5;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px}
+  .chart-wrap{position:relative;height:260px}
+  .tables{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width: 900px){.tables{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:0.82rem;font-family:'Inter',sans-serif}
+  th{text-align:left;padding:8px 10px;color:#8888a0;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:600}
+  td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);color:#d0d0e0}
+  td.mono{font-family:'JetBrains Mono',monospace;font-size:0.78rem}
+  tr:hover td{background:rgba(6,182,212,0.04)}
+  .status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+  .status-active{background:rgba(0,230,118,0.15);color:#00e676}
+  .status-trial{background:rgba(6,182,212,0.15);color:#06B6D4}
+  .status-expired,.status-cancelled{background:rgba(255,71,87,0.15);color:#ff4757}
+  .status-free,.status-pending{background:rgba(136,136,160,0.15);color:#8888a0}
+  .status-cancel_pending{background:rgba(255,143,94,0.15);color:#ff8f5e}
+  .truncate{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:bottom}
+  .empty{color:#55556a;text-align:center;padding:24px;font-size:0.85rem}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="top">
+  <div>
+    <h1>RatSignal Admin</h1>
+    <div class="subtitle">Signed in as {{ admin_email }}</div>
+  </div>
+  <div>
+    <a href="/auth/profile" class="backlink">← Back to profile</a>
+  </div>
+</div>
+
+<!-- ============ Summary cards ============ -->
+<div class="cards">
+  <div class="card accent-orange">
+    <div class="label">Total users</div>
+    <div class="value">{{ stats.total_users }}</div>
+    <div class="sub">+{{ stats.new_users_7d }} in last 7 days</div>
+  </div>
+  <div class="card accent-green">
+    <div class="label">Active subscribers</div>
+    <div class="value">{{ stats.active_subs }}</div>
+    <div class="sub">{{ stats.lifetime_subs }} lifetime</div>
+  </div>
+  <div class="card accent-cyan">
+    <div class="label">Revenue (total)</div>
+    <div class="value">${{ '%.2f' % stats.revenue_usd_all }}</div>
+    <div class="sub">${{ '%.2f' % stats.revenue_usd_7d }} in last 7 days</div>
+  </div>
+  <div class="card">
+    <div class="label">Payments (7d)</div>
+    <div class="value">{{ stats.new_payments_7d }}</div>
+    <div class="sub">completed in last 7 days</div>
+  </div>
+</div>
+
+<!-- ============ Charts ============ -->
+<div class="charts">
+  <div class="panel">
+    <h2>Daily signups · last 30 days</h2>
+    <div class="chart-wrap"><canvas id="signupsChart"></canvas></div>
+  </div>
+  <div class="panel">
+    <h2>Active plans</h2>
+    <div class="chart-wrap"><canvas id="plansChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ============ Tables ============ -->
+<div class="tables">
+  <div class="panel">
+    <h2>Recent signups</h2>
+    {% if recent_users %}
+    <table>
+      <thead><tr>
+        <th>ID</th><th>Email / Telegram</th><th>Status</th><th>When</th>
+      </tr></thead>
+      <tbody>
+        {% for u in recent_users %}
+        <tr>
+          <td class="mono">{{ u.id }}</td>
+          <td>
+            <span class="truncate" title="{{ u.email }}">{{ u.email }}</span>
+            {% if u.telegram_username or u.telegram %}
+            <div style="color:#55556a;font-size:0.72rem;font-family:'JetBrains Mono',monospace;">@{{ u.telegram_username or u.telegram }}</div>
+            {% endif %}
+          </td>
+          <td>
+            <span class="status-badge status-{{ (u.subscription_status or 'free') }}">{{ u.subscription_status or 'free' }}</span>
+          </td>
+          <td class="mono">{{ u.created_at[:16] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No signups yet.</div>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <h2>Recent payments</h2>
+    {% if recent_payments %}
+    <table>
+      <thead><tr>
+        <th>Email</th><th>Amount</th><th>Plan</th><th>Status</th><th>When</th>
+      </tr></thead>
+      <tbody>
+        {% for p in recent_payments %}
+        <tr>
+          <td>
+            <span class="truncate" title="{{ p.email }}">{{ p.email or '(user ' ~ p.user_id ~ ')' }}</span>
+          </td>
+          <td class="mono">${{ '%.2f' % (p.amount_cents / 100) }}</td>
+          <td class="mono">{{ p.plan }}</td>
+          <td><span class="status-badge status-{{ (p.status or 'pending') | lower }}">{{ p.status }}</span></td>
+          <td class="mono">{{ p.created_at[:16] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No payments yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+</div>
+
+<script>
+  Chart.defaults.color = '#8888a0';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+  // Signups line chart
+  const signups = {{ signup_series | tojson }};
+  new Chart(document.getElementById('signupsChart'), {
+    type: 'line',
+    data: {
+      labels: signups.map(s => s.date.slice(5)),  // MM-DD
+      datasets: [{
+        label: 'Signups',
+        data: signups.map(s => s.count),
+        borderColor: '#ff6b2b',
+        backgroundColor: 'rgba(255,107,43,0.15)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 3,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } },
+        x: { ticks: { maxTicksLimit: 10 } },
+      },
+    },
+  });
+
+  // Plans pie chart
+  const plans = {{ plan_breakdown | tojson }};
+  if (plans.length === 0) {
+    const wrap = document.getElementById('plansChart').parentElement;
+    wrap.innerHTML = '<div class="empty">No active subscribers yet.</div>';
+  } else {
+    new Chart(document.getElementById('plansChart'), {
+      type: 'doughnut',
+      data: {
+        labels: plans.map(p => p.plan),
+        datasets: [{
+          data: plans.map(p => p.count),
+          backgroundColor: ['#ff6b2b', '#06B6D4', '#00e676', '#ff8f5e', '#8888a0', '#ffd700'],
+          borderColor: '#0a1628',
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { padding: 14 } } },
+      },
+    });
+  }
+</script>
+
+</body>
+</html>

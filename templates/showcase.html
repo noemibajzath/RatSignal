@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatSignal | Design Showcase</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/static/img/logo.png" type="image/png">
+
+    <!-- Design System V2 -->
+    <link rel="stylesheet" href="/static/css/style_v2.css">
+
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</head>
+<body class="showcase-body">
+
+<!-- ===== SHOWCASE NAVIGATION ===== -->
+<nav class="showcase-nav">
+    <div class="showcase-nav-inner">
+        <span class="showcase-nav-title">RatSignal Showcase</span>
+        <a href="#heroes" class="showcase-nav-link">Heroes (8)</a>
+        <a href="#dashboards" class="showcase-nav-link">Dashboard (2+agg)</a>
+        <a href="#pipeline-v1" class="showcase-nav-link">Pipeline</a>
+        <a href="#signals-v1" class="showcase-nav-link">Signals</a>
+        <a href="#atlas-v1" class="showcase-nav-link">ATLAS</a>
+        <a href="#pricing-v1" class="showcase-nav-link">Pricing</a>
+        <a href="#marquee-v1" class="showcase-nav-link">Marquee</a>
+        <a href="#footer-v1" class="showcase-nav-link">Footer</a>
+    </div>
+</nav>
+
+<div style="height: 60px;"></div>
+
+<!-- ============================= -->
+<!-- HERO VARIANTS (8)             -->
+<!-- ============================= -->
+<div class="showcase-section" id="heroes">
+    <div class="showcase-section-title">
+        <h2>Hero Sections</h2>
+        <p>8 hero variants. Dot Grid Reveal, Spotlight Orb, 3D Card Float, Gradient Pulse, Terminal, Cinematic Split, Marquee Hero, Neon Glow.</p>
+    </div>
+
+    {% include "partials/showcase_heroes.html" %}
+</div>
+
+<!-- ============================= -->
+<!-- DASHBOARD VARIANTS (5)        -->
+<!-- ============================= -->
+<div class="showcase-section" id="dashboards">
+    <div class="showcase-section-title">
+        <h2>Bot Dashboard</h2>
+        <p>2 dashboard layouts (Spotlight Bento Grid + Terminal Leaderboard) + Aggregate Stats Bar. The core of the site: 9 trading bots with live PnL.</p>
+    </div>
+
+    {% include "partials/showcase_dashboard.html" %}
+</div>
+
+<!-- ============================= -->
+<!-- ALL OTHER SECTIONS            -->
+<!-- Pipeline (4) + Signals (3) +  -->
+<!-- ATLAS (3) + Pricing (3) +     -->
+<!-- Marquee (2) + Footer (2)      -->
+<!-- ============================= -->
+{% include "partials/showcase_sections.html" %}
+
+<!-- ===== SCRIPTS ===== -->
+<script src="/static/js/dotgrid.js"></script>
+<script src="/static/js/spotlight.js"></script>
+<script src="/static/js/marquee.js"></script>
+<script src="/static/js/sparkline.js"></script>
+<script src="/static/js/app.js"></script>
+
+</body>
+</html>

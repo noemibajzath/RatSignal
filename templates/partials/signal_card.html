@@ -1,0 +1,38 @@
+{# Signal card macro — reusable Jinja2 partial for a single signal card #}
+{% macro signal_card(sig) %}
+<div class="signal-card {{ 'signal-glow-green' if sig.result == 'win' else 'signal-glow-red' }}">
+    <div class="signal-card-header">
+        <span class="signal-pair">{{ sig.pair }}</span>
+        <span class="signal-badge {{ 'signal-dir-long' if sig.direction == 'long' else 'signal-dir-short' }}">
+            {{ sig.direction|upper }}
+        </span>
+    </div>
+    <div class="signal-pnl {{ 'signal-pnl-win' if sig.result == 'win' else 'signal-pnl-loss' }}">
+        {{ '+' if sig.pnl >= 0 else '' }}${{ '%.2f'|format(sig.pnl) }}
+        {% if sig.pnl_pct %}
+        <span class="signal-pnl-pct">({{ '+' if sig.pnl_pct >= 0 else '' }}{{ '%.2f'|format(sig.pnl_pct) }}%)</span>
+        {% endif %}
+    </div>
+    <div class="signal-prices">
+        <div class="signal-price-row">
+            <span class="signal-label">Entry</span>
+            <span class="signal-value">{{ sig.entry_price }}</span>
+        </div>
+        <div class="signal-price-row">
+            <span class="signal-label">Exit</span>
+            <span class="signal-value">{{ sig.exit_price }}</span>
+        </div>
+    </div>
+    <div class="signal-risk">
+        {% for i in range(5) %}
+        <span class="signal-star{{ ' signal-star-filled' if i < sig.risk_score else '' }}">&#9733;</span>
+        {% endfor %}
+    </div>
+    <div class="signal-footer">
+        <span class="signal-time">{{ sig.timestamp[:16] }}</span>
+        {% if sig.bars_held %}
+        <span class="signal-bars">{{ sig.bars_held }} bars</span>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}

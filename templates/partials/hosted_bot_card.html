@@ -1,0 +1,105 @@
+<div class="bot-card" data-bot="{{ bot.bot }}">
+  {% if not bot.configured %}
+    <h2>{{ bot.display_name }} <span class="badge badge-none">Not configured</span></h2>
+    <p class="tagline">
+      {% if bot.bot == 'quickbite' %}
+        ML SHORT-only strategy. XGBoost, 6.6M training samples.
+      {% else %}
+        Copy-trade of 10 elite Hyperliquid wallets.
+      {% endif %}
+    </p>
+    <p class="config-line" style="color: var(--text-muted);">Configure to start auto-trading.</p>
+    <div class="card-actions">
+      <a class="btn btn-primary" href="{{ url_for('auth.auto_trade_setup', bot=bot.bot) }}">Set Up</a>
+    </div>
+
+  {% elif not bot.enabled %}
+    <h2>{{ bot.display_name }} <span class="badge badge-config">Configured</span></h2>
+    <p class="config-line">Exchange: <strong>{{ bot.config.exchange|capitalize }}</strong></p>
+    <p class="config-line">
+      Size:
+      {% if bot.config.sizing_mode == 'fixed' %}
+        <strong>${{ bot.config.position_size_usd }}</strong> fixed
+      {% else %}
+        <strong>{{ bot.config.position_size_pct }}%</strong> of balance
+      {% endif %}
+      &nbsp;&middot;&nbsp; <strong>{{ bot.config.leverage }}x</strong> leverage
+    </p>
+    <div class="card-actions">
+      <a class="btn btn-secondary" href="{{ url_for('auth.auto_trade_setup', bot=bot.bot) }}">Configure</a>
+      <button class="btn btn-primary"
+              onclick="if(confirm('Start auto-trading?\n\nThis will replicate trades onto your account using your API key.\n\nYou can pause anytime - pausing does NOT cancel your subscription.')) postAction('{{ bot.bot }}', 'activate')">
+        Activate
+      </button>
+    </div>
+
+  {% elif bot.paused %}
+    <h2>{{ bot.display_name }} <span class="badge badge-paused">Paused</span></h2>
+    <p class="config-line">{{ bot.config.exchange|capitalize }} &middot;
+       {% if bot.config.sizing_mode == 'fixed' %}${{ bot.config.position_size_usd }}{% else %}{{ bot.config.position_size_pct }}%{% endif %}
+       &middot; {{ bot.config.leverage }}x</p>
+    <div class="pause-notice">
+      <strong>Trading paused</strong> - your subscription is still active.
+      Existing open positions ({{ bot.stats.open_positions }}) will exit
+      naturally at the source bot's exit signal.
+      <span class="small">To cancel your subscription, go to <a href="{{ url_for('auth.dashboard') }}">Billing</a>.</span>
+    </div>
+    <div class="card-actions">
+      <a class="btn btn-secondary" href="{{ url_for('auth.auto_trade_setup', bot=bot.bot) }}">Configure</a>
+      <button class="btn btn-primary" onclick="postAction('{{ bot.bot }}', 'resume')">Resume</button>
+    </div>
+
+  {% else %}
+    <h2>{{ bot.display_name }} <span class="badge badge-active">Active</span></h2>
+    <p class="config-line">{{ bot.config.exchange|capitalize }} &middot;
+       {% if bot.config.sizing_mode == 'fixed' %}${{ bot.config.position_size_usd }}{% else %}{{ bot.config.position_size_pct }}%{% endif %}
+       &middot; {{ bot.config.leverage }}x</p>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-label">30d PnL</div>
+        <div class="stat-value {% if bot.stats.total_pnl >= 0 %}pnl-positive{% else %}pnl-negative{% endif %}">${{ "%.2f"|format(bot.stats.total_pnl) }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Trades</div>
+        <div class="stat-value">{{ bot.stats.trades }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Win rate</div>
+        <div class="stat-value">{{ "%.0f"|format(bot.stats.win_rate) }}%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Open</div>
+        <div class="stat-value">{{ bot.stats.open_positions }}</div>
+      </div>
+    </div>
+
+    {% if bot.recent_trades %}
+      <div class="recent-trades-title">// Recent trades</div>
+      <table>
+        <thead><tr><th>Symbol</th><th>Side</th><th>Size</th><th>PnL</th><th>Entry</th><th>Exit</th></tr></thead>
+        <tbody>
+        {% for t in bot.recent_trades %}
+          <tr>
+            <td style="color: var(--text-primary);">{{ t.symbol }}</td>
+            <td>{{ t.side }}</td>
+            <td>${{ "%.0f"|format(t.size_usd) }}</td>
+            <td class="{% if t.pnl_usd is not none and t.pnl_usd >= 0 %}pnl-positive{% elif t.pnl_usd is not none %}pnl-negative{% endif %}">
+              {% if t.pnl_usd is not none %}${{ "%.2f"|format(t.pnl_usd) }}{% else %}-{% endif %}
+            </td>
+            <td>{{ t.entry_at[:16] if t.entry_at else '-' }}</td>
+            <td>{{ t.exit_at[:16] if t.exit_at else 'open' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-message">No trades yet. Waiting for the next signal.</p>
+    {% endif %}
+
+    <div class="card-actions">
+      <a class="btn btn-secondary" href="{{ url_for('auth.auto_trade_setup', bot=bot.bot) }}">Configure</a>
+      <button class="btn btn-warning" onclick="postAction('{{ bot.bot }}', 'pause')">Pause Trading</button>
+    </div>
+  {% endif %}
+</div>

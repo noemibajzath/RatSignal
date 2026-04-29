@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatSignal - Smarter Than The Market</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --bg-dark: #0a1628;
+            --bg-card: #0f1f35;
+            --bg-card-hover: #162a45;
+            --accent-orange: #ff6b2b;
+            --accent-orange-glow: rgba(255, 107, 43, 0.3);
+            --accent-green: #00e676;
+            --accent-green-glow: rgba(0, 230, 118, 0.15);
+            --accent-red: #ff4757;
+            --accent-red-glow: rgba(255, 71, 87, 0.15);
+            --accent-cyan: #06B6D4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.15);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --border: #1a2d4a;
+            --gradient-rat: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ============ NAVBAR ============ */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 16px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 22, 40, 0.9);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-logo .rat-icon {
+            font-size: 1.6rem;
+        }
+
+        .nav-logo span.signal {
+            color: var(--accent-orange);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .nav-signin {
+            color: var(--accent-cyan) !important;
+            padding: 10px 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .nav-signin:hover {
+            opacity: 0.7;
+        }
+
+        .nav-cta {
+            background: var(--gradient-rat) !important;
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px var(--accent-orange-glow);
+        }
+
+        .nav-logout {
+            color: #ff4757 !important;
+            border: 1px solid #ff4757;
+            padding: 9px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .nav-logout:hover {
+            transform: translateY(-1px);
+            background: rgba(255,71,87,0.1);
+            box-shadow: 0 4px 16px rgba(255,71,87,0.25);
+        }
+
+        /* ============ HERO SECTION ============ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+            justify-content: stretch;
+            align-items: stretch;
+            padding: 80px 0 0;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-dark);
+            
+        }
+
+        /* Spotlight SVG */
+        .hero-spotlight {
+            pointer-events: none;
+            position: absolute;
+            z-index: 1;
+            height: 169%;
+            width: 138%;
+            opacity: 0;
+            animation: spotlightFade 2s ease 0.5s forwards;
+            top: -40%;
+            left: 0;
+        }
+
+        @keyframes spotlightFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (min-width: 1024px) {
+            .hero-spotlight {
+                width: 84%;
+                left: 60%;
+                top: -20%;
+            }
+        }
+
+        .hero-left {
+            flex: 1;
+            padding: 48px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-right {
+            flex: 1;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .hero-right canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        #spline-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .spline-loader {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spline-loader .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 107, 43, 0.1);
+            border: 1px solid rgba(255, 107, 43, 0.2);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--accent-orange);
+            font-weight: 500;
+            margin-bottom: 32px;
+            animation: fadeInUp 0.6s ease;
+            width: fit-content;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(0, 230, 118, 0); }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease 0.1s both;
+        }
+
+        .hero h1 .highlight {
+            background: var(--gradient-rat);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 .rat-emoji {
+            -webkit-text-fill-color: initial;
+            display: inline-block;
+            animation: ratWiggle 3s ease-in-out infinite;
+        }
+
+        @keyframes ratWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin-bottom: 36px;
+            animation: fadeInUp 0.6s ease 0.2s both;
+            line-height: 1.7;
+        }
+
+        .hero-subtitle strong {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        /* Responsive: stack on mobile */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                padding-top: 100px;
+            }
+            .hero-left {
+                padding: 32px 24px;
+                text-align: center;
+                align-items: center;
+            }
+            .hero-right {
+                min-height: 350px;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .btn-primary {
+            background: var(--gradient-rat);
+            color: white;
+            padding: 16px 36px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-orange-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 16px 36px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card); color: var(--accent-cyan);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ LIVE TICKER ============ */
+        .live-ticker-section {
+            padding: 100px 48px;
+        }
+
+        .live-ticker {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        .ticker-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 28px;
+            min-width: 240px;
+            width: 240px;
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .ticker-card:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        .ticker-card.active-green {
+            border-color: rgba(0, 230, 118, 0.3);
+        }
+
+        .ticker-card.active-green::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-green);
+            box-shadow: 0 0 20px var(--accent-green-glow);
+        }
+
+        .ticker-card.active-red {
+            border-color: rgba(255, 71, 87, 0.3);
+        }
+
+        .ticker-card.active-red::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-red);
+            box-shadow: 0 0 20px var(--accent-red-glow);
+            --accent-cyan: #06B6D4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.15);
+        }
+
+        .ticker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .ticker-name {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .ticker-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ticker-status.live {
+            color: var(--accent-green);
+        }
+
+        .ticker-status.stopped {
+            color: var(--accent-red);
+        }
+
+        .ticker-status .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .ticker-status.live .status-dot {
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        .ticker-status.stopped .status-dot {
+            background: var(--accent-red);
+        }
+
+        .ticker-pnl {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .ticker-pnl.positive {
+            color: var(--accent-green);
+        }
+
+        .ticker-pnl.negative {
+            color: var(--accent-red);
+        }
+
+        .ticker-meta {
+            font-size: 0.8rem;
+            color: var(--accent-cyan); opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .ticker-mini-chart {
+            margin-top: 12px;
+            height: 40px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .ticker-mini-chart .bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            min-height: 4px;
+            transition: height 0.3s;
+        }
+
+        .ticker-mini-chart .bar.green { background: rgba(0, 230, 118, 0.5); }
+        .ticker-mini-chart .bar.red { background: rgba(255, 71, 87, 0.5); }
+
+        /* ============ ACCOUNT POPUP OVERLAY ============ */
+        .account-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 2000;
+            background: rgba(5, 12, 24, 0.85);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+        .account-overlay.active { display: flex; }
+        .account-popup {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            width: 460px;
+            max-width: 92vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: popIn 0.25s ease;
+            position: relative;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .account-popup::-webkit-scrollbar { width: 4px; }
+        .account-popup::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .popup-close {
+            position: absolute; top: 16px; right: 16px;
+            background: none; border: none; color: var(--text-muted);
+            font-size: 1.4rem; cursor: pointer; line-height: 1;
+        }
+        .popup-close:hover { color: var(--text-primary); }
+        .popup-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+        .popup-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 20px; }
+        .popup-stats {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px; margin-bottom: 20px;
+        }
+        .popup-stat {
+            background: rgba(10, 22, 40, 0.5);
+            border-radius: 10px; padding: 12px; text-align: center;
+        }
+        .popup-stat-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .popup-stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; margin-top: 4px; }
+        .popup-stat-value.positive { color: var(--accent-green); }
+        .popup-stat-value.negative { color: var(--accent-red); }
+        .popup-stat-value.neutral { color: var(--accent-cyan); }
+        .popup-equity { width: 100%; height: 90px; margin-bottom: 16px; border-radius: 8px; }
+        .popup-section { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin: 14px 0 8px; }
+        .popup-positions { display: flex; flex-direction: column; gap: 6px; }
+        .popup-pos-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; padding: 6px 10px;
+            background: rgba(10, 22, 40, 0.4); border-radius: 6px;
+        }
+        .popup-pos-symbol { font-weight: 600; color: var(--text-primary); }
+        .popup-pos-side { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+        .popup-pos-side.long { color: var(--accent-green); }
+        .popup-pos-side.short { color: var(--accent-red); }
+
+        .ticker-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .ticker-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+        /* ============ TRUST BAR ============ */
+        .trust-bar {
+            padding: 100px 48px;
+        }
+
+        .trust-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 64px;
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            text-align: center;
+        }
+
+        .trust-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            line-height: 1;
+        }
+
+        .trust-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .strategies-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .strategy-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .strategy-card:hover {
+            border-color: var(--accent-orange);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(5, 15, 30, 0.4);
+        }
+
+        .strategy-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-rat);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .strategy-card:hover::after {
+            opacity: 1;
+        }
+
+        .strategy-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .strategy-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .strategy-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .strategy-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .strategy-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding-top: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .stat-value.green { color: var(--accent-green); }
+        .stat-value.orange { color: var(--accent-orange); }
+
+        /* ============ PNL SHOWCASE ============ */
+        .pnl-section {
+            padding: 100px 48px;
+            background: var(--bg-dark);
+        }
+
+        .pnl-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pnl-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+        }
+
+        .pnl-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .pnl-card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .pnl-period {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: var(--bg-dark);
+            padding: 4px 12px;
+            border-radius: 100px;
+        }
+
+        .pnl-value-big {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 8px;
+        }
+
+        .pnl-chart-placeholder {
+            height: 120px;
+            background: linear-gradient(180deg, rgba(0, 230, 118, 0.05) 0%, transparent 100%);
+            border-radius: 12px;
+            margin-top: 16px;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 8px 8px;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        .pnl-bar {
+            flex: 1;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s ease;
+        }
+
+        /* ============ WHY US / EDGE SECTION ============ */
+.tv-indicator-link:hover {            border-color: var(--accent-orange) !important;            box-shadow: 0 0 30px rgba(255,107,43,0.15) !important;        }        .tv-view-btn:hover {            transform: translateY(-2px);            box-shadow: 0 4px 20px rgba(6,182,212,0.25);        }        .tv-subscribe-btn:hover {            transform: translateY(-2px);            box-shadow: 0 4px 20px rgba(255,107,43,0.3);        }
+        .edge-section {
+            padding: 100px 48px;
+        }
+
+        .edge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .edge-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .edge-card:hover {
+            border-color: var(--accent-orange);
+            transform: translateY(-4px);
+        }
+
+        .edge-icon {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+        }
+
+        .edge-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            margin-bottom: 8px;
+        }
+
+        .edge-label {
+            font-size: 0.9rem;
+            color: var(--accent-cyan); opacity: 0.75;
+            line-height: 1.5;
+        }
+
+        /* ============ STATISTICS BOT ============ */
+        /* ============ EXPLANATION / LECSÓ ============ */
+        .explainer {
+            padding: 100px 48px;
+        }
+
+        .explainer-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .explainer-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            margin-top: 48px;
+        }
+
+        .explainer-step {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .step-number {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-rat);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* ============ PRICING ============ */
+        .pricing {
+            padding: 100px 48px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: stretch;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 22px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-orange);
+        }
+
+        @media (max-width: 900px) {
+            .pricing-grid { grid-template-columns: 1fr; max-width: 480px; }
+        }
+
+        .pricing-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-rat);
+            padding: 4px 20px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-orange);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-4px);
+        }
+
+        .pricing-plan {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pricing-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 16px 0;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 24px 0 32px;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        .pricing-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .pricing-btn.primary {
+            background: var(--gradient-rat);
+            border: none;
+            color: white;
+        }
+
+        .pricing-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .pricing-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(5, 15, 30, 0.4);
+        }
+
+        /* ============ DOWNLOADS ============ */
+        .downloads-section {
+            padding: 80px 48px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .pkg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+        .pkg-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+        }
+        .pkg-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,107,43,0.4);
+        }
+        .pkg-card.featured {
+            border-color: rgba(255,107,43,0.5);
+            background: linear-gradient(180deg, rgba(255,107,43,0.06) 0%, rgba(255,107,43,0.01) 100%);
+        }
+        .pkg-card.featured::before {
+            content: 'RECOMMENDED';
+            position: absolute; top: -12px; right: 20px;
+            background: var(--gradient-rat);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .pkg-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .pkg-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .pkg-tagline {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        .pkg-features {
+            list-style: none;
+            margin: 0 0 24px 0;
+            padding: 0;
+            flex-grow: 1;
+        }
+        .pkg-features li {
+            padding: 6px 0 6px 24px;
+            position: relative;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .pkg-features li::before {
+            content: '✓';
+            position: absolute; left: 0;
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+        .pkg-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--gradient-rat);
+            color: #fff !important;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: transform 0.15s, box-shadow 0.15s;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .pkg-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px var(--accent-orange-glow);
+        }
+        .pkg-size {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 10px;
+        }
+        .info-box {
+            background: rgba(6, 182, 212, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 40px auto 0;
+            max-width: 880px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .info-box strong { color: var(--accent-cyan); }
+        .notice-box {
+            background: rgba(255, 107, 43, 0.06);
+            border: 1px solid rgba(255, 107, 43, 0.25);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 24px auto 0;
+            max-width: 880px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .notice-box strong { color: var(--accent-orange); }
+        .requirements {
+            margin: 48px auto 0;
+            max-width: 880px;
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+        .requirements h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .req-item {
+            padding: 14px 16px;
+            background: rgba(10, 22, 40, 0.6);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .req-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-orange);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .req-item .value {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        /* ============ FOOTER ============ */
+        footer {
+            padding: 100px 48px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-logo .signal { color: var(--accent-orange); }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ============ LIVE CHART ============ */
+        .chart-section {
+            padding: 100px 48px;
+        }
+        .chart-wrapper {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+        .chart-wrapper.loading::after {
+            content: 'Loading live data...';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        .chart-wrapper.error::after {
+            content: 'Could not load chart data';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            color: var(--accent-red);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        .chart-toolbar {
+            padding: 12px 20px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .chart-symbol {
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+        .chart-interval {
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .chart-price {
+            color: var(--accent-green);
+            margin-left: auto;
+            font-weight: 600;
+        }
+        .rs-chart-candle {
+            height: 320px;
+        }
+        .rs-chart-indicator {
+            height: 220px;
+        }
+        .chart-legend {
+            padding: 10px 20px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 14px;
+            height: 3px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+        .legend-color.hist {
+            height: 10px;
+            width: 6px;
+            border-radius: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-section { padding: 60px 16px; }
+            .rs-chart-candle { height: 240px; }
+            .rs-chart-indicator { height: 160px; }
+            .chart-legend { gap: 12px; font-size: 0.75rem; }
+        }
+
+        /* ============ IPHONE DEMO ============ */
+        .iphone-demo {
+            padding: 100px 48px;
+            text-align: center;
+        }
+        .iphone-layout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 80px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .iphone-right {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+        .iphone-right h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+        .iphone-right p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 480px;
+        }
+        .btn-signal-group {
+            display: inline-block;
+            padding: 16px 36px;
+            background: var(--gradient-rat);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--accent-orange-glow);
+        }
+        .btn-signal-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-orange-glow);
+        }
+        @media (max-width: 768px) {
+            .iphone-layout {
+                flex-direction: column;
+                gap: 40px;
+            }
+            .iphone-right {
+            text-align: center;
+                align-items: center;
+                text-align: center;
+            }
+        }
+        .iphone-container {
+            position: relative;
+            width: 300px;
+            height: 620px;
+            margin: 0 auto;
+        }
+        .iphone-frame {
+            position: absolute;
+            inset: 0;
+            border-radius: 44px;
+            border: 4px solid #2a2a3a;
+            background: #000;
+            box-shadow: 0 0 0 2px #1a1a2a, 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(6,182,212,0.08), inset 0 0 0 2px #333;
+            overflow: hidden;
+        }
+        .iphone-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 28px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 10;
+        }
+        .iphone-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 40px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .iphone-screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fff;
+        }
+        .iphone-container::before {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 140px;
+            width: 4px;
+            height: 60px;
+            background: #2a2a3a;
+            border-radius: 0 4px 4px 0;
+        }
+        .iphone-container::after {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 120px;
+            width: 4px;
+            height: 36px;
+            background: #2a2a3a;
+            border-radius: 4px 0 0 4px;
+            box-shadow: 0 50px 0 #2a2a3a, 0 86px 0 #2a2a3a;
+        }
+        .iphone-glow {
+            position: absolute;
+            inset: -20px;
+            border-radius: 60px;
+            background: radial-gradient(ellipse at center, rgba(255,107,43,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .phone-label {
+            margin-top: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* ============ ANIMATIONS ============ */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .strategies-grid, .pricing-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+            .edge-grid { grid-template-columns: repeat(2, 1fr); }
+            .pnl-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 3rem; }
+            .pricing-card.featured { transform: none; }
+            .pricing-card.featured:hover { transform: translateY(-4px); }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 12px 20px; }
+            .nav-links { display: none; }
+            .hero { padding: 100px 20px 60px; }
+            .hero h1 { font-size: 2.2rem; }
+            .section-title { font-size: 2rem; }
+            .edge-grid { grid-template-columns: 1fr; }
+            .trust-numbers { gap: 32px; }
+            .explainer-step { flex-direction: column; gap: 16px; }
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <!-- ======== NAVBAR ======== -->
+    <nav>
+        <a href="#top" class="nav-logo">
+            <img src="/static/rat_logo.png" alt="RatSignal" class="rat-icon" style="height:28px;width:auto;vertical-align:middle;">
+            Rat<span class="signal" style="margin-left:-2px;">Signal</span>
+        </a>
+        <div class="nav-links">
+            <a href="#accounts">Live accounts</a>
+            <a href="#chart">Our indicator</a>
+            <a href="#signals">Signal group</a>
+            <a href="#how">How it works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#downloads" id="nav-downloads-link" style="display:none;">Downloads</a>
+            <a href="/auth/auto-trade" id="nav-autotrade-link" style="color:#ff6b2b;font-weight:600;">Auto-Trading</a>
+            <a href="/auth/profile" id="nav-profile-link" style="display:none;">Profile</a>
+            <a href="/auth/logout" id="nav-logout-link" class="nav-logout" style="display:none;">Logout</a>
+            <a href="/auth/login" id="nav-signin-link" class="nav-signin">Sign in</a>
+            <a href="/auth/register" id="nav-getstarted-link" class="nav-cta">Get started</a>
+        </div>
+    </nav>
+
+    <!-- ======== HERO ======== -->
+    <section class="hero" id="top">
+        <!-- Spotlight effect -->
+        <svg class="hero-spotlight" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3787 2842" fill="none">
+            <g filter="url(#spotlight-filter)">
+                <ellipse cx="1924.71" cy="273.501" rx="1924.71" ry="273.501"
+                    transform="matrix(-0.822377 -0.568943 -0.568943 0.822377 3631.88 2291.09)"
+                    fill="white" fill-opacity="0.21"/>
+            </g>
+            <defs>
+                <filter id="spotlight-filter" x="0.860352" y="0.838989" width="3785.16" height="2840.26"
+                    filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                    <feGaussianBlur stdDeviation="151" result="effect1_foregroundBlur"/>
+                </filter>
+            </defs>
+        </svg>
+
+        <!-- Left content -->
+        <div class="hero-left">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                {{ agg.accounts_live }} strategies running - LIVE
+            </div>
+            <h1>
+                The Market's best kept 
+                <span class="highlight">recipe</span>
+
+            </h1>
+            <p class="hero-subtitle">
+                ML-powered crypto trading signals that process
+                <strong>thousands of indicators</strong> and <strong>years of 15-minute data</strong>
+                - so you don't have to
+            </p>
+            <div class="hero-actions">
+                <a href="/auth/register" class="btn-primary" style="text-decoration:none;display:inline-block;">Taste it for free in May</a>
+            </div>
+        </div>
+
+        <!-- Right content: Interactive 3D Rat Model -->
+        <div class="hero-right">
+            <div id="spline-container">
+                <div class="spline-loader">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three.js GLB Rat Model -->
+    <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }}
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const container = document.getElementById('spline-container');
+        container.innerHTML = '';
+
+        const scene = new THREE.Scene();
+        // scene background removed - using CSS background for consistency
+
+        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(0, 0.8, 3.8);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.8;
+        container.appendChild(renderer.domElement);
+
+        // Dark dramatic lighting - matching the screenshot
+        // Very dim ambient to keep it dark
+        const ambientLight = new THREE.AmbientLight(0x8899bb, 1.0);
+        scene.add(ambientLight);
+
+        // Main cyan/turquoise rim light from the left
+        const cyanLight = new THREE.SpotLight(0x06B6D4, 4.0, 15, Math.PI / 3, 0.5);
+        cyanLight.position.set(-3, 2, 1);
+        cyanLight.target.position.set(0, 0.5, 0);
+        scene.add(cyanLight);
+        scene.add(cyanLight.target);
+
+        // Warm subtle fill from the right (golden eye glow effect)
+        const warmLight = new THREE.PointLight(0xffaa44, 1.5, 8);
+        warmLight.position.set(2, 1.5, 2);
+        scene.add(warmLight);
+
+        // Top-down dim light for shape definition
+        const topLight = new THREE.DirectionalLight(0x334466, 0.4);
+        topLight.position.set(0, 5, 0);
+        scene.add(topLight);
+
+        // Subtle back light for silhouette
+        const backLight = new THREE.PointLight(0x1a3355, 1.0, 10);
+        backLight.position.set(0, 2, -3);
+        scene.add(backLight);
+
+        // Mouse tracking with velocity
+        let mouseX = 0, mouseY = 0;
+        let prevMouseX = 0, prevMouseY = 0;
+        let mouseVelocity = 0;
+        let ratModel = null;
+        let hatGroup = null;
+        // Toggle the chef hat on the rat. Flip to true to bring it back.
+        const SHOW_CHEF_HAT = false;
+
+        document.addEventListener('mousemove', (e) => {
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+            const dx = mouseX - prevMouseX;
+            const dy = mouseY - prevMouseY;
+            mouseVelocity = Math.min(Math.sqrt(dx * dx + dy * dy) * 18, 1.0);
+        });
+
+        // Load GLB model
+        const loader = new GLTFLoader();
+        loader.load('/static/rat_model.glb', (gltf) => {
+            console.log('Model loaded successfully');
+            // Debug: log all node names
+            gltf.scene.traverse((child) => {
+                console.log('Node:', child.name, 'Type:', child.type, 'isMesh:', child.isMesh, 'isBone:', child.isBone);
+            });
+            ratModel = gltf.scene;
+
+            // Make materials darker/more metallic
+            ratModel.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    child.material.metalness = 0.7;
+                    child.material.roughness = 0.3;
+                    child.material.envMapIntensity = 1.2;
+                    child.material.needsUpdate = true;
+                }
+            });
+
+            // Auto-center and scale
+            const box = new THREE.Box3().setFromObject(ratModel);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 2.15 / maxDim;
+            ratModel.scale.setScalar(scale);
+            ratModel.position.sub(center.multiplyScalar(scale));
+            ratModel.position.y += 0.6;
+
+            // Chef hat - 3D GLB model added to scene
+            if (SHOW_CHEF_HAT) {
+                hatGroup = new THREE.Group();
+                scene.add(hatGroup);
+                const hatLoader2 = new GLTFLoader();
+                hatLoader2.load('/static/chef_hat_3d.glb', (hatGltf) => {
+                    const hatModel = hatGltf.scene;
+                    const hatBox = new THREE.Box3().setFromObject(hatModel);
+                    const hatSize = hatBox.getSize(new THREE.Vector3());
+                    const hatMaxDim = Math.max(hatSize.x, hatSize.y, hatSize.z);
+                    const hatScale = 0.85 / hatMaxDim;
+                    hatModel.scale.setScalar(hatScale);
+                    const hatCenter = hatBox.getCenter(new THREE.Vector3());
+                    hatModel.position.sub(hatCenter.multiplyScalar(hatScale));
+                    // Lighten dark band material
+                    hatModel.traverse((child) => {
+                        if (child.isMesh && child.material) {
+                            const c = child.material.color;
+                            // If material is very dark (black band), make it grey
+                            if (c.r < 0.15 && c.g < 0.15 && c.b < 0.15) {
+                                child.material.color.setHex(0xbbbbbb);
+                                child.material.needsUpdate = true;
+                            }
+                        }
+                    });
+                    hatGroup.add(hatModel);
+                    console.log('Chef hat loaded');
+                });
+            }
+
+            scene.add(ratModel);
+
+            // Hide loader
+            const loaderEl = container.querySelector('.spline-loader');
+            if (loaderEl) loaderEl.style.display = 'none';
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Decay mouse velocity smoothly
+            mouseVelocity *= 0.92;
+
+            if (ratModel) {
+                // Head follows cursor - wider range + velocity boost
+                const baseRotY = Math.PI * -0.5;
+                const rotRange = 1.1 + mouseVelocity * 0.6;
+                const targetRotY = baseRotY + mouseX * rotRange;
+                const targetRotX = mouseY * (0.6 + mouseVelocity * 0.4);
+
+                // Faster lerp when mouse is moving
+                const lerpSpeed = 0.12 + mouseVelocity * 0.35;
+
+                if (!ratModel._initialized) {
+                    ratModel.rotation.y = targetRotY;
+                    ratModel.rotation.x = targetRotX;
+                    ratModel._initialized = true;
+                } else {
+                    ratModel.rotation.y += (targetRotY - ratModel.rotation.y) * lerpSpeed;
+                    ratModel.rotation.x += (targetRotX - ratModel.rotation.x) * lerpSpeed;
+                }
+
+                // Bob - more intense when cursor moves
+                const t = Date.now() * 0.001;
+                const bobBase = Math.sin(t) * 0.02;
+                const bobReactive = Math.sin(t * 4.5) * 0.035 * mouseVelocity;
+                ratModel.position.y = 0.6 + bobBase + bobReactive;
+
+                // Slight scale pulse on fast cursor movement
+                const scalePulse = 1.0 + mouseVelocity * 0.04;
+                const baseScale = ratModel._baseScale || ratModel.scale.x;
+                if (!ratModel._baseScale) ratModel._baseScale = ratModel.scale.x;
+                const targetScale = baseScale * scalePulse;
+                ratModel.scale.setScalar(ratModel.scale.x + (targetScale - ratModel.scale.x) * 0.15);
+
+                // Slight tilt (roll) based on horizontal mouse velocity
+                const tiltTarget = (mouseX - prevMouseX) * -2.5;
+                ratModel.rotation.z = (ratModel.rotation.z || 0) * 0.9 + tiltTarget * 0.1;
+
+                // Position hat above rat head in world space
+                if (hatGroup) {
+                    const headOffset = new THREE.Vector3(0.05, 1.05, -0.25);
+                    headOffset.applyEuler(ratModel.rotation);
+                    hatGroup.position.copy(ratModel.position).add(headOffset);
+                    hatGroup.rotation.copy(ratModel.rotation);
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
+    </script>
+    <!-- ======== LIVE TICKER - 9 Lighter subaccounts ======== -->
+    <section class="live-ticker-section" id="accounts">
+        <div class="section-header animate-on-scroll" style="margin-bottom: 32px;">
+            <div class="section-tag">// Live accounts</div>
+            <h2 class="section-title">{{ agg.accounts_total }} active bots on Lighter DEX</h2>
+            <p class="section-subtitle">click any card for details</p>
+        </div>
+        <div class="live-ticker" id="accounts-grid">
+            {% for acct in accounts %}
+            <div class="ticker-card {{ 'active-green' if acct.total_pnl >= 0 else 'active-red' }}" id="ticker-{{ acct.id }}" onclick="toggleDetail({{ acct.id }})">
+                <div class="ticker-header">
+                    <span class="ticker-name">#{{ acct.id }} {{ acct.display_name }}</span>
+                    {% if acct.status == 'live' %}
+                    <span class="ticker-status live"><span class="status-dot"></span> ACTIVE</span>
+                    {% else %}
+                    <span class="ticker-status stopped"><span class="status-dot"></span> PAUSED</span>
+                    {% endif %}
+                </div>
+                <div class="ticker-pnl {{ 'positive' if acct.pnl_pct >= 0 else 'negative' }}" id="pnl-{{ acct.id }}">{% if acct.pnl_pct >= 0 %}+{{ '%.2f' % acct.pnl_pct }}%{% else %}{{ '%.2f' % acct.pnl_pct }}%{% endif %}</div>
+                <div class="ticker-meta">{{ acct.description[:40] }}</div>
+                <div class="ticker-meta" style="margin-top:4px; font-size:0.72rem; color:#6a7a90;">{{ acct.days_live }} napja eles</div>
+                <div class="ticker-mini-chart" id="chart-{{ acct.id }}"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Account popup overlay -->
+    <div class="account-overlay" id="account-overlay" onclick="if(event.target===this)closeDetail()">
+        <div class="account-popup" id="account-popup"></div>
+    </div>
+
+    <!-- ======== TRUST BAR ======== -->
+    <section class="trust-bar">
+        <div class="trust-numbers">
+            <div class="trust-item animate-on-scroll">
+                <div class="trust-number" data-target="147">0</div>
+                <div class="trust-label">ML Indicators</div>
+            </div>
+            <div class="trust-item animate-on-scroll">
+                <div class="trust-number" data-target="5200000" data-suffix="M+" data-display="5.2M+">0</div>
+                <div class="trust-label">15-min candles processed</div>
+            </div>
+            <div class="trust-item animate-on-scroll">
+                <div class="trust-number" data-target="4" data-suffix="+">0</div>
+                <div class="trust-label">years of historical data</div>
+            </div>
+            <div class="trust-item animate-on-scroll">
+                <div class="trust-number" data-target="{{ agg.accounts_live }}">0</div>
+                <div class="trust-label">active strategies</div>
+            </div>
+        </div>
+    </section>
+
+        <section class="chart-section" id="chart">
+        <div class="section-header animate-on-scroll">
+            <div class="section-tag">// Our indicator</div>
+            <h2 class="section-title">RatSignal Flow - Live</h2>
+            <p class="section-subtitle">Our proprietary momentum scanner, live on TradingView - BTC/USDT 15m</p>
+        </div>
+        <div class="chart-wrapper animate-on-scroll loading" id="rsChartWrapper">
+            <div class="chart-toolbar">
+                <span class="chart-symbol">BTC / USDT</span>
+                <span class="chart-interval">15m</span>
+                <span class="chart-price" id="rsChartPrice">--</span>
+            </div>
+            <div class="rs-chart-candle" id="rsChartCandle"></div>
+            <div class="rs-chart-indicator" id="rsChartIndicator"></div>
+            <div class="chart-legend">
+                <span class="legend-item"><span class="legend-color" style="background:#00FFFF"></span>Fisher Transform</span>
+                <span class="legend-item"><span class="legend-color" style="background:#00BFFF"></span>WaveTrend 1</span>
+                <span class="legend-item"><span class="legend-color" style="background:#FF6600"></span>WaveTrend 2</span>
+                <span class="legend-item"><span class="legend-color hist" style="background:#39FF14"></span>rsiMFI</span>
+                <span class="legend-item"><span style="color:#39FF14;font-size:1rem;">&#9650;</span> LONG</span>
+                <span class="legend-item"><span style="color:#FF073A;font-size:1rem;">&#9660;</span> SHORT</span>
+            </div>
+        </div>
+
+        <div class="animate-on-scroll" style="text-align:center;margin-top:24px;">
+            <a href="/auth/register" class="btn-primary" style="text-decoration:none;display:inline-block;">
+                Get our indicator included in your subscription
+            </a>
+        </div>
+    </section>
+
+    <!-- ======== IPHONE DEMO ======== -->
+    <section class="iphone-demo" id="signals">
+        <div class="section-header animate-on-scroll">
+            <div class="section-tag">// Signal group</div>
+            <h2 class="section-title">See it in action</h2>
+            <p class="section-subtitle">Real-time signals delivered straight to your phone</p>
+        </div>
+        <div class="iphone-layout">
+            <div>
+                <div class="iphone-container animate-on-scroll">
+                    <div class="iphone-glow"></div>
+                    <div class="iphone-frame">
+                        <div class="iphone-notch"></div>
+                        <div class="iphone-screen">
+                            <video id="demo-video" src="/static/atlas_demo.mp4" autoplay muted loop playsinline preload="auto" webkit-playsinline style="width:100%;height:100%;object-fit:contain;background:#fff;"></video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-right animate-on-scroll">
+                <h3>Join our exclusive signal group</h3>
+                <p>Get real-time trading signals, strategy updates, and direct access to our AI-powered insights - delivered straight to Telegram</p>
+                <a href="#pricing" class="btn-signal-group">Cook with us in our signal group</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ======== EDGE SECTION ======== -->
+
+
+    <!-- ======== HOW IT WORKS ======== -->
+    <section class="explainer" id="how">
+        <div class="explainer-content">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">// How it works</div>
+                <h2 class="section-title">ML-powered signals, delivered to you</h2>
+                <p class="section-subtitle">Built on machine learning - trained on 5+ years of market data</p>
+            </div>
+            <div class="explainer-steps">
+                <div class="explainer-step animate-on-scroll">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>We process everything on the charts</h3>
+                        <p>Candles, volume, momentum, divergence - our ML model digests 5+ years of historical market data and learns which patterns lead to profit. It finds the connections on its own.</p>
+                    </div>
+                </div>
+                <div class="explainer-step animate-on-scroll">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>We distill it into clear signals</h3>
+                        <p>One clean view. It tells you when to open, when to close, and just as importantly - when to do nothing. No noise, no guessing.</p>
+                    </div>
+                </div>
+                <div class="explainer-step animate-on-scroll">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>You get alerts in real time</h3>
+                        <p>Join our premium Telegram group and get real-time signal alerts on your phone - entry zones, take profits, stop loss, risk scores - so you're never late to a setup. One subscription, everything included.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== LIVE CHART ======== -->
+    <!-- ======== PRICING ======== -->
+    <section class="pricing" id="pricing">
+        <div class="section-header animate-on-scroll">
+            <div class="section-tag">// Pricing</div>
+            <h2 class="section-title">Simple pricing, full access</h2>
+            <p class="section-subtitle">No tiers, no feature gates - you get everything from day one</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card animate-on-scroll">
+                <div class="pricing-plan">Monthly</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">Everything included, cancel anytime</div>
+                <div class="pricing-price">$100<span>/mo</span></div>
+                <ul class="pricing-features">
+                    <li style="color: var(--accent-green); font-weight: 600;">Free cancellation in the first week</li>
+                    <li>Free access to our signal group</li>
+                    <li>TradingView indicator included</li>
+                    <li style="color: var(--accent-orange); font-weight: 500;">30-day money-back guarantee if results are negative</li>
+                </ul>
+                <a href="/auth/register" class="pricing-btn primary" style="text-decoration:none;display:inline-block;text-align:center;">Subscribe now →</a>
+            </div>
+            <div class="pricing-card featured animate-on-scroll">
+                <div class="pricing-plan">Yearly</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">Best value - pay once a year</div>
+                <div class="pricing-price">$1,000<span>/yr</span></div>
+                <ul class="pricing-features">
+                    <li style="color: var(--accent-green); font-weight: 600;">Save $200 vs. monthly</li>
+                    <li>Free access to our signal group</li>
+                    <li>TradingView indicator included</li>
+                    <li>Everything from Monthly - for a full year</li>
+                    <li style="color: var(--accent-orange); font-weight: 500;">30-day money-back guarantee if results are negative</li>
+                </ul>
+                <a href="/auth/register" class="pricing-btn primary" style="text-decoration:none;display:inline-block;text-align:center;">Subscribe now →</a>
+            </div>
+            <div class="pricing-card animate-on-scroll">
+                <div class="pricing-plan">Lifetime</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">One payment, forever yours</div>
+                <div class="pricing-price">$100,000</div>
+                <ul class="pricing-features">
+                    <li style="color: var(--accent-green); font-weight: 600;">Everything in monthly - forever</li>
+                    <li>All ML models & source weights</li>
+                    <li>Strategy source code & logic</li>
+                    <li>Indicator codebase & formulas</li>
+                    <li>Signal generation pipeline</li>
+                    <li>Bot infrastructure & deployment configs</li>
+                    <li>Future models & updates included</li>
+                    <li style="color: var(--accent-orange); font-weight: 500;">Full IP ownership of all delivered assets</li>
+                </ul>
+                <a href="mailto:ratsignalcrypto@gmail.com?subject=Lifetime%20Plan%20Inquiry" class="pricing-btn secondary" style="text-decoration:none;display:inline-block;text-align:center;">Contact us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== DOWNLOADS (logged-in subscribers only) ======== -->
+    <section class="downloads-section" id="downloads" style="display:none;">
+        <div class="section-header animate-on-scroll">
+            <div class="section-tag">// Downloads</div>
+            <h2 class="section-title">Download our trading bots</h2>
+            <p class="section-subtitle">Three mirror clients. Each one replicates every trade <strong>RatSignal</strong> places on its own Lighter account, onto <strong>your</strong> exchange account - whenever your computer is on and connected to the internet.</p>
+        </div>
+
+        <div class="pkg-grid">
+            <!-- Slipstream -->
+            <div class="pkg-card">
+                <div class="pkg-label">Package A</div>
+                <div class="pkg-name">Slipstream</div>
+                <div class="pkg-tagline">Copy-trade bot. Follows 10 elite Hyperliquid wallets.</div>
+                <ul class="pkg-features">
+                    <li><strong>Fully automated:</strong> positions open, scale in, and close on your account without you touching anything</li>
+                    <li>Mirrors the Slipstream bot on RatSignal's Lighter sub-account - every open / close / increase / decrease in real time</li>
+                    <li>Runs on <strong>Lighter.xyz</strong> <em>or</em> <strong>Binance Futures</strong> - pick your exchange in <code>.env</code></li>
+                    <li>Optional <strong>copy-leverage</strong> mode</li>
+                    <li>Built-in local stop-loss and max-hold safety on your side</li>
+                </ul>
+                <a href="/download/slipstream.zip" class="pkg-btn">Download Slipstream</a>
+                <div class="pkg-size">ZIP &middot; 64 KB &middot; Python 3.10+</div>
+            </div>
+
+            <!-- Quick Bite -->
+            <div class="pkg-card">
+                <div class="pkg-label">Package B</div>
+                <div class="pkg-name">Quick Bite</div>
+                <div class="pkg-tagline">Autonomous ML SHORT bot. XGBoost model, 4.5-hour hold.</div>
+                <ul class="pkg-features">
+                    <li><strong>Fully automated:</strong> every SHORT we open is mirrored to your account within seconds</li>
+                    <li>Mirrors the Quick Bite ML bot on RatSignal's Lighter sub-account</li>
+                    <li>Runs on <strong>Lighter.xyz</strong> <em>or</em> <strong>Binance Futures</strong></li>
+                    <li>Backtest: 7/7 datasets positive, +$47K on $100K capital, max 4.5% drawdown</li>
+                    <li>Built-in local stop-loss and max-hold safety on your side</li>
+                </ul>
+                <a href="/download/quickbite.zip" class="pkg-btn">Download Quick Bite</a>
+                <div class="pkg-size">ZIP &middot; 64 KB &middot; Python 3.10+</div>
+            </div>
+
+            <!-- Duo (featured) -->
+            <div class="pkg-card featured">
+                <div class="pkg-label">Package C</div>
+                <div class="pkg-name">Duo</div>
+                <div class="pkg-tagline">Both bots in one download. Run them side by side.</div>
+                <ul class="pkg-features">
+                    <li><strong>Two fully automated bots running in parallel</strong> - copy-trade + autonomous ML, hands-off</li>
+                    <li>Contains everything from Slipstream <em>and</em> Quick Bite</li>
+                    <li>Both bots run on <strong>Lighter.xyz</strong> <em>or</em> <strong>Binance Futures</strong> (configurable per bot)</li>
+                    <li>Includes a dedicated <code>DUO_GETTING_STARTED.md</code></li>
+                    <li>Requires <strong>two</strong> exchange sub-accounts (one per bot)</li>
+                </ul>
+                <a href="/download/duo.zip" class="pkg-btn">Download Duo</a>
+                <div class="pkg-size">ZIP &middot; 134 KB &middot; Python 3.10+</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            Every ZIP contains an English <strong>GETTING_STARTED.md</strong> as the first thing you open - it walks you through installation, configuration and first run in about 30 minutes.
+        </div>
+
+        <div class="notice-box">
+            <strong>Note.</strong> The bots run on your own hardware and use your own exchange API keys. To actually place trades you need: (a) Python 3.10+ installed, (b) a funded exchange account (Lighter or Binance Futures), (c) API keys with trading enabled, and (d) a Telegram bot token or Discord webhook for alerts.
+        </div>
+
+        <div class="requirements">
+            <h2>What you will need on your side</h2>
+            <div class="req-grid">
+                <div class="req-item">
+                    <div class="label">Runtime</div>
+                    <div class="value">Python 3.10+ on Windows / macOS / Linux</div>
+                </div>
+                <div class="req-item">
+                    <div class="label">Exchange</div>
+                    <div class="value">Lighter.xyz sub-account <strong>or</strong> Binance Futures account</div>
+                </div>
+                <div class="req-item">
+                    <div class="label">Capital</div>
+                    <div class="value">$20-$50 USDC / USDT to start testing</div>
+                </div>
+                <div class="req-item">
+                    <div class="label">Alerts</div>
+                    <div class="value">Telegram bot token <strong>or</strong> Discord webhook</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== FOOTER ======== -->
+    <footer>
+        <div class="footer-logo"><img src="/static/rat_logo.png" alt="🐀" style="height:1.2em;vertical-align:middle;display:inline-block;"> Rat<span class="signal">Signal</span></div>
+        <p class="footer-text">The rat never sleeps. Neither does our market watch.</p>
+        <p class="footer-text" style="margin-top: 8px;">© 2026 RatSignal. All rights reserved.</p>
+    </footer>
+
+    <!-- ======== CHART LIB ======== -->
+    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="/static/js/ratsignal-chart.js"></script>
+
+    <!-- ======== SCRIPTS ======== -->
+    <script>
+        // ---- Mini chart generator ----
+        function generateMiniChart(containerId, positive) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const bars = 20;
+            for (let i = 0; i < bars; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const height = Math.random() * 30 + 5;
+                bar.style.height = height + 'px';
+                if (positive) {
+                    bar.classList.add(Math.random() > 0.3 ? 'green' : 'red');
+                } else {
+                    bar.classList.add(Math.random() > 0.6 ? 'green' : 'red');
+                }
+                container.appendChild(bar);
+            }
+        }
+
+        generateMiniChart('chart1', true);
+        generateMiniChart('chart2', true);
+        generateMiniChart('chart3', false);
+        generateMiniChart('chart4', true);
+
+        // ---- PNL Chart generator ----
+        function generatePnlChart(containerId, trend) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const bars = 40;
+            let accumulated = 10;
+            for (let i = 0; i < bars; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'pnl-bar';
+                accumulated += (Math.random() - 0.3) * trend;
+                if (accumulated < 5) accumulated = 5;
+                bar.style.height = accumulated + 'px';
+                bar.style.background = accumulated > 15
+                    ? 'rgba(0, 230, 118, 0.4)'
+                    : 'rgba(255, 107, 43, 0.3)';
+                container.appendChild(bar);
+            }
+        }
+
+        generatePnlChart('pnlChart1', 3);
+        generatePnlChart('pnlChart2', 4);
+        generatePnlChart('pnlChart3', 3.5);
+
+        // ---- Counter animation ----
+        function animateCounters() {
+            const counters = document.querySelectorAll('.trust-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const display = counter.getAttribute('data-display');
+                const suffix = counter.getAttribute('data-suffix') || '';
+
+                if (display) {
+                    counter.textContent = display;
+                    return;
+                }
+
+                let current = 0;
+                const increment = target / 60;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    counter.textContent = Math.floor(current) + suffix;
+                }, 25);
+            });
+        }
+
+        // ---- Scroll animations ----
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Trigger counter animation when trust bar is visible
+                    if (entry.target.closest('.trust-bar')) {
+                        animateCounters();
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // ---- Live account ticker refresh from /api/accounts ----
+        function refreshTickers() {
+            fetch('/api/accounts')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.accounts) return;
+                    data.accounts.forEach(acct => {
+                        const card = document.getElementById('ticker-' + acct.id);
+                        if (!card) return;
+                        // Update PnL
+                        const pnlEl = document.getElementById('pnl-' + acct.id);
+                        if (pnlEl) {
+                            var pct = acct.pnl_pct || 0;
+                            pnlEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+                            pnlEl.className = 'ticker-pnl ' + (pct >= 0 ? 'positive' : 'negative');
+                        }
+                        // Update card border color
+                        card.className = 'ticker-card ' + (acct.total_pnl >= 0 ? 'active-green' : 'active-red');
+                        // Update status
+                        const statusEl = card.querySelector('.ticker-status');
+                        if (statusEl) {
+                            if (acct.status === 'live') {
+                                statusEl.className = 'ticker-status live';
+                                statusEl.innerHTML = '<span class="status-dot"></span> ACTIVE';
+                            } else {
+                                statusEl.className = 'ticker-status stopped';
+                                statusEl.innerHTML = '<span class="status-dot"></span> PAUSED';
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.warn('Ticker refresh failed:', err));
+        }
+
+        setInterval(refreshTickers, 30000);
+        setTimeout(refreshTickers, 5000);
+
+        // ---- Smooth scroll ----
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+    <script src="/static/js/main.js"></script>
+
+<script>
+(function() {
+    var vid = document.getElementById('demo-video');
+    if (!vid) return;
+    vid.muted = true;
+    vid.playbackRate = 1.5;
+
+    function tryPlay() {
+        vid.muted = true;
+        vid.playbackRate = 1.5;
+        vid.play().then(function() {
+            vid.playbackRate = 1.5;
+        }).catch(function(){});
+    }
+
+    tryPlay();
+    vid.addEventListener('loadeddata', tryPlay);
+    vid.addEventListener('canplay', tryPlay);
+    document.addEventListener('DOMContentLoaded', tryPlay);
+    window.addEventListener('load', tryPlay);
+    document.addEventListener('touchstart', tryPlay, { once: true });
+    document.addEventListener('click', tryPlay, { once: true });
+    document.addEventListener('scroll', tryPlay, { once: true });
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) { if (e.isIntersecting) tryPlay(); });
+        }, { threshold: 0.1 }).observe(vid);
+    }
+})();
+</script>
+
+<script>
+// Adjust nav based on auth/subscription state.
+//   - Logged in:           swap "Sign in" + "Get started" for "Profile"
+//   - Logged in + active:  also show "Downloads"
+(function() {
+    var dl = document.getElementById('nav-downloads-link');
+    var autotrade = document.getElementById('nav-autotrade-link');
+    var profile = document.getElementById('nav-profile-link');
+    var logout = document.getElementById('nav-logout-link');
+    var signin = document.getElementById('nav-signin-link');
+    var getstarted = document.getElementById('nav-getstarted-link');
+    fetch('/auth/status', { credentials: 'same-origin', cache: 'no-store' })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+            if (!data) return;
+            if (data.logged_in) {
+                if (signin) signin.style.display = 'none';
+                if (getstarted) getstarted.style.display = 'none';
+                if (profile) profile.style.display = '';
+                if (logout) logout.style.display = '';
+                if (data.subscription_active) {
+                    if (dl) dl.style.display = '';
+                    var dlSection = document.getElementById('downloads');
+                    if (dlSection) dlSection.style.display = '';
+                }
+            }
+        })
+        .catch(function() {});
+})();
+</script>
+</body>
+
+<!-- ======== FAQ SIDE TAB ======== -->
+<style>
+.faq-tab{position:fixed;left:28px;bottom:28px;z-index:9998;display:flex;align-items:flex-end}
+.faq-fab{position:relative;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#ff6b2b,#ff8f5e);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(255,107,43,0.3);transition:transform .2s,box-shadow .2s;padding:0;overflow:visible}.faq-fab img{width:42px;height:42px;border-radius:50%;object-fit:cover}.faq-fab-label{position:absolute;bottom:-2px;right:-2px;background:#06B6D4;color:#fff;font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;padding:3px 5px;border-radius:6px;border:2px solid #0a1628;letter-spacing:0.5px}
+.faq-fab:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(255,107,43,0.4)}
+.faq-fab.active{background:linear-gradient(135deg,#06B6D4,#38d9f5);box-shadow:0 4px 24px rgba(6,182,212,0.3)}
+.faq-panel{width:0;overflow:hidden;background:#0c1a2e;border-right:none;transition:width .35s ease;display:flex;flex-direction:column}
+.faq-panel.open{width:380px}
+.faq-panel-inner{width:380px;padding:28px 24px;overflow-y:auto;max-height:80vh}
+.faq-panel-title{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:#f0f0f5;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.faq-panel-title span{color:#ff6b2b}
+.faq-item{margin-bottom:4px}
+.faq-question{width:100%;background:rgba(15,31,53,0.8);border:1px solid #1a2d4a;border-radius:10px;padding:12px 16px;color:#f0f0f5;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;text-align:left;transition:all .2s;display:flex;justify-content:space-between;align-items:center}
+.faq-question:hover{border-color:#06B6D4;background:#162a45}
+.faq-question.open{border-color:#ff6b2b;border-radius:10px 10px 0 0;border-bottom:none}
+.faq-arrow{font-size:.7rem;color:#8888a0;transition:transform .2s}
+.faq-question.open .faq-arrow{transform:rotate(180deg);color:#ff6b2b}
+.faq-answer{display:none;background:rgba(15,31,53,0.6);border:1px solid #1a2d4a;border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;color:#8888a0;font-size:.82rem;line-height:1.6;margin-bottom:8px}
+.faq-answer.open{display:block}
+.faq-answer strong{color:#06B6D4}
+.faq-answer a{color:#ff6b2b;text-decoration:none}
+.faq-answer a:hover{text-decoration:underline}
+@media(max-width:768px){.faq-panel.open{width:300px}.faq-panel-inner{width:300px;padding:20px 16px}.faq-tab{top:auto;bottom:120px;transform:none}}
+</style>
+
+<div class="faq-tab" id="faqTab">
+    <div class="faq-panel" id="faqPanel">
+        <div class="faq-panel-inner">
+            <div class="faq-panel-title"><span>?</span> Frequently Asked Questions</div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">What is RatSignal? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">RatSignal is an AI-powered crypto trading signal service. We run <strong>3 independent strategies</strong> - an autonomous trading system (ATLAS), a prediction market arbitrage bot, and a smart money pattern discovery engine - and deliver the results as actionable signals to our subscribers.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">How much does it cost? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">The monthly plan is <strong>$100/month</strong> and the yearly plan is <strong>$1,000/year</strong> (save $200 vs. monthly). You can cancel for free in the first week. There's also a <strong>30-day money-back guarantee</strong> if results are negative. A lifetime plan ($100,000) includes full source code and IP ownership.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">How do I receive signals? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">Signals are delivered in real time through our <strong>premium Telegram group</strong>. Each signal includes entry zones, take profit levels, stop loss, and a risk score. Our team adds you within 24 hours of registration.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">What is the ATLAS trading system? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">ATLAS is our autonomous crypto trading system. It runs <strong>9 parallel accounts</strong> across 78 crypto pairs on 15-minute candles, governed by 26 AI agents. Strategies are derived from 438 quant books and the system continuously self-evolves through A/B testing.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">Is the arbitrage bot really risk-free? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">Yes - the prediction market arbitrage bot exploits price differences between <strong>Kalshi and Polymarket</strong>. It buys both sides of a binary outcome across two exchanges when the combined cost is below $1.00, locking in a guaranteed profit regardless of the result.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">Can I cancel anytime? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">Yes. You can cancel your subscription at any time. The <strong>first week is free cancellation</strong> with no charge. After that, if your results are negative, you're covered by our <strong>30-day money-back guarantee</strong>.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">What exchanges do you trade on? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">ATLAS trades on the <strong>Lighter DEX</strong> (decentralized exchange). The arbitrage bot operates across <strong>Kalshi and Polymarket</strong>. The smart money system analyzes <strong>GMX</strong> on-chain data and executes on <strong>Binance</strong>.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">Do I need trading experience? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer">No. Our signals are designed to be clear and actionable - we tell you exactly what to do. Entry price, take profit, stop loss, and risk score are all included. You just follow the signal on your own exchange account.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">How do I get started? <span class="faq-arrow">▼</span></button>
+                <div class="faq-answer"><a href="/auth/register">Create an account</a>, and our team will add you to the premium Telegram signal group within 24 hours. You'll start receiving real-time alerts straight away.</div>
+            </div>
+
+            <div style="margin-top:16px;padding:12px 14px;background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.15);border-radius:10px;font-size:.8rem;color:#8888a0;line-height:1.5;text-align:center;">
+                Can't find what you're looking for? Ask our <span style="color:#ff6b2b;cursor:pointer;font-weight:600;" onclick="toggleFaqPanel();toggleChat(true);">chatbot</span> - it knows everything about RatSignal.
+            </div>
+        </div>
+    </div>
+    <button class="faq-fab" id="faqTabBtn" onclick="toggleFaqPanel()"><img src="/static/rat_logo.png" alt="FAQ"><span class="faq-fab-label">FAQ</span></button>
+</div>
+
+<script>
+function toggleFaqPanel(){
+    var panel=document.getElementById('faqPanel');
+    var btn=document.getElementById('faqTabBtn');
+    panel.classList.toggle('open');
+    btn.classList.toggle('active');
+}
+function toggleFaq(el){
+    var answer=el.nextElementSibling;
+    var wasOpen=el.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-question.open').forEach(function(q){q.classList.remove('open');q.nextElementSibling.classList.remove('open');});
+    if(!wasOpen){el.classList.add('open');answer.classList.add('open');}
+}
+</script>
+
+<!-- ======== CHAT WIDGET ======== -->
+<style>
+.chat-fab{position:fixed;bottom:28px;right:28px;width:64px;height:64px;border-radius:50%;background:#06B6D4;border:none;cursor:pointer;z-index:9999;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(6,182,212,0.3);transition:transform .2s,box-shadow .2s;padding:0;overflow:visible}
+
+.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(6,182,212,0.4)}
+.chat-fab.open{display:none}
+
+
+
+
+
+
+.chat-panel{position:fixed;bottom:28px;right:28px;width:380px;max-height:520px;background:#12121a;border:1px solid #1e1e2e;border-radius:16px;z-index:9999;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,0.5)}
+.chat-panel.open{display:flex}
+.chat-panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#0a0a0f;border-bottom:1px solid #1e1e2e}
+.chat-panel-title{font-family:"JetBrains Mono",monospace;font-size:.85rem;color:#ff6b2b;font-weight:700}
+.chat-panel-close{background:none;border:none;color:#8888a0;font-size:1.2rem;cursor:pointer;padding:0;line-height:1}
+.chat-panel-close:hover{color:#f0f0f5}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:300px;max-height:380px}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:#1e1e2e;border-radius:4px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:.88rem;line-height:1.5;word-wrap:break-word}
+.chat-msg.user{align-self:flex-end;background:#ff6b2b;color:#fff;border-bottom-right-radius:4px}
+.chat-msg.bot{align-self:flex-start;background:#0a0a0f;color:#f0f0f5;border:1px solid #1e1e2e;border-bottom-left-radius:4px}
+.chat-msg.bot.typing{color:#8888a0;font-style:italic}
+.chat-input-row{display:flex;padding:12px;border-top:1px solid #1e1e2e;gap:8px}
+.chat-input{flex:1;padding:10px 14px;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;color:#f0f0f5;font-family:Inter,sans-serif;font-size:.88rem;outline:none}
+.chat-input:focus{border-color:#ff6b2b}
+.chat-input::placeholder{color:#55556a}
+.chat-send{padding:10px 16px;background:linear-gradient(135deg,#ff6b2b,#ff8f5e);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:.88rem;font-weight:600;transition:opacity .2s}
+.chat-send:hover{opacity:.85}
+.chat-send:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:480px){.chat-panel{width:calc(100vw - 24px);right:12px;bottom:12px;max-height:70vh}.chat-fab{bottom:16px;right:16px}}
+</style>
+
+<button class="chat-fab" id="chatFab" onclick="toggleChat(true)">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+</button>
+<div class="chat-panel" id="chatPanel">
+    <div class="chat-panel-header">
+        <span class="chat-panel-title">RatSignal Assistant</span>
+        <button class="chat-panel-close" onclick="toggleChat(false)">&times;</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">Hey! Ask me anything about our trading signals, bots, or pricing!</div>
+    </div>
+    <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Type your message..." autocomplete="off">
+        <button class="chat-send" id="chatSendBtn" onclick="sendChatMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    var fab=document.getElementById("chatFab"),panel=document.getElementById("chatPanel"),input=document.getElementById("chatInput"),sendBtn=document.getElementById("chatSendBtn"),messagesEl=document.getElementById("chatMessages");
+
+    window.toggleChat=function(open){if(open){fab.classList.add("open");panel.classList.add("open");input.focus()}else{fab.classList.remove("open");panel.classList.remove("open")}};
+    input.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChatMessage()}});
+
+    function appendMessage(text,role){
+        var msg=document.createElement("div");
+        msg.className="chat-msg "+role;
+        msg.innerHTML=text;
+        messagesEl.appendChild(msg);
+        messagesEl.scrollTop=messagesEl.scrollHeight;
+        return msg;
+    }
+
+    var FALLBACK='Unfortunately, I can\'t help with that. Please reach out to our colleagues at <a href="mailto:ratsignalcrypto@gmail.com" style="color:#ff6b2b;">ratsignalcrypto@gmail.com</a> \u2014 they\'ll be happy to assist you!';
+
+    /* ---- Knowledge base ---- */
+    var KB=[
+        {
+            id:'greeting',
+            patterns:[/^(hi|hello|hey|howdy|sup|yo|hiya|good\s*(morning|evening|afternoon|day)|greetings|what'?s?\s*up)/i],
+            words:[],
+            answer:'Hey there! \uD83D\uDC4B I can answer questions about RatSignal \u2014 our trading signals, pricing, strategies, and how to get started. What would you like to know?'
+        },
+        {
+            id:'what_is',
+            patterns:[/what\s*(is|are)\s*(ratsignal|rat\s*signal|you|this)/i, /tell\s*me\s*(about|more)/i, /who\s*are\s*you/i, /explain\s*(ratsignal|rat\s*signal|what|this)/i, /describe/i],
+            words:['ratsignal','about'],
+            answer:'RatSignal is an AI-powered crypto trading signal service. We run 3 independent strategies \u2014 ATLAS (autonomous trading system), a prediction market arbitrage bot, and a smart money pattern discovery engine \u2014 and deliver actionable signals to our subscribers via Telegram.'
+        },
+        {
+            id:'pricing',
+            patterns:[/how\s*much/i, /what('?s|\s*is)\s*(the\s*)?(price|cost|fee|subscription)/i, /pric/i, /afford/i, /cheap/i, /expensive/i, /worth/i, /discount/i],
+            words:['price','cost','pricing','subscription','plan','pay','fee','payment','dollar','usd','money','charge','billing','bill','monthly','annual','yearly'],
+            answer:'Our Monthly plan is <strong>$100/month</strong> and our Yearly plan is <strong>$1,000/year</strong> (save $200 vs. monthly). Free cancellation in the first week, plus a 30-day money-back guarantee if results are negative. We also offer a Lifetime plan ($100,000) that includes full source code and IP ownership.'
+        },
+        {
+            id:'signals',
+            patterns:[/how\s*(do|can|will)\s*(i|we)\s*(get|receive|access)/i, /where\s*(do|are)\s*(the\s*)?(signal|alert)/i, /send\s*(me\s*)?(signal|alert)/i],
+            words:['signal','signals','telegram','alert','alerts','notification','notifications','deliver','delivery','receive','channel','group'],
+            answer:'Signals are delivered in real time through our <strong>premium Telegram group</strong>. Each signal includes entry zones, take profit levels, stop loss, and a risk score. After you register, our team adds you within 24 hours.'
+        },
+        {
+            id:'atlas',
+            patterns:[/what\s*(is|are)\s*(the\s*)?(atlas|trading\s*system|trading\s*bot)/i, /how\s*does\s*(atlas|the\s*(bot|system))\s*work/i, /autonomous/i],
+            words:['atlas','autonomous','parallel','accounts','subaccount','subaccounts','pairs','candle','candles','quant'],
+            answer:'ATLAS is our autonomous crypto trading system. It runs <strong>9 parallel accounts</strong> across 78 crypto pairs on 15-minute candles on the Lighter DEX. Strategies are derived from 438 quant books and the system continuously self-evolves through A/B testing.'
+        },
+        {
+            id:'arbitrage',
+            patterns:[/arbitrage/i, /prediction\s*market/i, /risk\s*free/i, /guaranteed\s*(profit|return)/i],
+            words:['arbitrage','kalshi','polymarket','prediction','risk-free','riskfree','binary'],
+            answer:'Our prediction market arbitrage bot exploits price differences between <strong>Kalshi and Polymarket</strong>. It buys both sides of a binary outcome across two exchanges when the combined cost is below $1.00, locking in a guaranteed profit regardless of the result.'
+        },
+        {
+            id:'smart_money',
+            patterns:[/smart\s*money/i, /whale/i, /on[\s-]*chain/i, /copy\s*trad/i],
+            words:['smart','whale','whales','gmx','onchain','on-chain','copy','copytrading'],
+            answer:'Our smart money strategy analyzes <strong>GMX</strong> on-chain data to detect large trader patterns, then executes corresponding trades on <strong>Binance</strong>. It follows the moves of consistently profitable wallets.'
+        },
+        {
+            id:'cancel',
+            patterns:[/can\s*i\s*cancel/i, /cancel/i, /refund/i, /money\s*back/i, /return\s*(my\s*)?money/i, /stop\s*(my\s*)?(sub|plan|payment)/i, /unsubscribe/i],
+            words:['cancel','cancellation','refund','guarantee','moneyback','unsubscribe'],
+            answer:'Yes, you can cancel anytime! The <strong>first week is free cancellation</strong> with no charge. After that, if your results are negative, you\'re covered by our <strong>30-day money-back guarantee</strong>.'
+        },
+        {
+            id:'exchanges',
+            patterns:[/wh(at|ich)\s*(exchange|platform|dex)/i, /where\s*(do\s*)?(you|we|it)\s*trade/i, /trade\s*on/i],
+            words:['exchange','exchanges','lighter','dex','decentralized','platform','binance'],
+            answer:'ATLAS trades on the <strong>Lighter DEX</strong> (decentralized exchange). The arbitrage bot operates across <strong>Kalshi and Polymarket</strong>. The smart money system analyzes <strong>GMX</strong> on-chain data and executes on <strong>Binance</strong>.'
+        },
+        {
+            id:'get_started',
+            patterns:[/how\s*(do|can|to)\s*(i|we)?\s*(start|begin|join|sign|register|subscribe|buy|purchase|get\s*started)/i, /i\s*want\s*to\s*(start|join|sign|register|subscribe|try)/i, /sign\s*(me\s*)?up/i, /where\s*(do\s*i|to)\s*(sign|register|start)/i],
+            words:['start','started','begin','join','register','signup','sign-up','subscribe','enroll','onboard'],
+            answer:'It\'s easy to get started! Just <a href="/auth/register" style="color:#ff6b2b;">create an account</a> and our team will add you to the premium Telegram signal group within 24 hours. No trading experience needed \u2014 each signal tells you exactly what to do.'
+        },
+        {
+            id:'experience',
+            patterns:[/do\s*i\s*need\s*(any\s*)?(experience|knowledge|skill)/i, /(beginner|newbie|noob|new\s*to)/i, /never\s*traded/i, /don'?t\s*know\s*(how|anything|much)/i, /easy\s*to\s*(use|follow|understand)/i, /is\s*it\s*(easy|hard|difficult|simple)/i],
+            words:['beginner','beginners','newbie','noob','experience','experienced','easy','simple','difficult','hard','learn','learning'],
+            answer:'No trading experience needed! Our signals are clear and actionable \u2014 we tell you exactly what to do. Entry price, take profit, stop loss, and risk score are all included. You just follow the signal on your own exchange account.'
+        },
+        {
+            id:'indicator',
+            patterns:[/indicator/i, /tradingview/i, /trading\s*view/i, /ratsignal\s*flow/i, /chart/i, /technical\s*analysis/i],
+            words:['indicator','indicators','tradingview','chart','charts','flow','fisher','wavetrend','rsi','momentum','scanner','technical'],
+            answer:'RatSignal Flow is our proprietary momentum scanner, available live on TradingView. It combines Fisher Transform, WaveTrend, and rsiMFI indicators on BTC/USDT 15m. It\'s included with your subscription!'
+        },
+        {
+            id:'ml',
+            patterns:[/machine\s*learn/i, /how\s*(does|do)\s*(the\s*)?(ai|ml|model|algorithm|system)\s*work/i, /what\s*(tech|data|model)/i, /train/i],
+            words:['ml','machine','learning','ai','artificial','intelligence','model','models','algorithm','data','historical','trained','training','neural','deep'],
+            answer:'Our system is built on machine learning, trained on <strong>5+ years of historical market data</strong> (over 5.2M 15-minute candles). It uses 147 ML indicators to find patterns that lead to profit.'
+        },
+        {
+            id:'strategies',
+            patterns:[/what\s*(are\s*)?(the\s*)?(strateg|approach)/i, /how\s*many\s*strateg/i, /which\s*strateg/i, /what\s*kind/i, /types?\s*of\s*(strateg|trad)/i],
+            words:['strategy','strategies','approach','approaches','method','methods','technique'],
+            answer:'We run <strong>3 independent strategies</strong>: (1) <strong>ATLAS</strong> \u2014 autonomous trading across 78 crypto pairs on Lighter DEX, (2) <strong>Prediction Market Arbitrage</strong> \u2014 risk-free profits between Kalshi and Polymarket, and (3) <strong>Smart Money</strong> \u2014 following whale patterns from GMX to Binance.'
+        },
+        {
+            id:'performance',
+            patterns:[/how\s*(well|good|much)\s*(do|does|is|are|have)/i, /profit/i, /return/i, /roi/i, /result/i, /performance/i, /track\s*record/i, /pnl/i, /p&l/i, /win\s*rate/i, /success/i, /make\s*money/i, /earn/i],
+            words:['profit','profits','profitable','return','returns','roi','result','results','performance','pnl','win','winrate','success','earn','earnings','gains','gain','loss','losses','track'],
+            answer:'You can see our <strong>live performance</strong> right here on the homepage \u2014 all 9 ATLAS accounts display real-time PnL. Each account card shows current profit/loss percentage and status. Click on any account to see detailed stats including win rate, Sharpe ratio, and equity curve.'
+        },
+        {
+            id:'safe',
+            patterns:[/is\s*(it|this)\s*(safe|secure|legit|legitimate|trustworthy|reliable|scam|real|legal)/i, /can\s*i\s*trust/i, /scam/i, /rug/i, /fraud/i, /risk/i],
+            words:['safe','secure','security','legit','legitimate','trust','trustworthy','reliable','scam','fraud','risk','risky','legal'],
+            answer:'Your security is our priority. We never ask for your exchange credentials or funds \u2014 you trade on your own account. Our results are displayed live and transparently on the homepage. Plus, we offer a <strong>free first week</strong> and a <strong>30-day money-back guarantee</strong> if results are negative.'
+        },
+        {
+            id:'crypto',
+            patterns:[/which\s*(coin|crypto|token|asset|pair|market)/i, /what\s*(coin|crypto|token|pair|market)/i, /(btc|bitcoin|eth|ethereum|altcoin)/i, /what\s*do\s*you\s*trade/i],
+            words:['coin','coins','crypto','token','tokens','pair','pairs','bitcoin','btc','ethereum','eth','altcoin','altcoins','asset','assets','market','markets'],
+            answer:'ATLAS trades <strong>78 crypto pairs</strong> on 15-minute candles. The signals cover major pairs like BTC and ETH as well as altcoins. Each signal specifies the exact pair, entry, take profit, and stop loss \u2014 so you always know exactly what to trade.'
+        },
+        {
+            id:'lifetime',
+            patterns:[/lifetime/i, /source\s*code/i, /ip\s*(owner|right)/i, /buy\s*(the\s*)?(whole|everything|company|code)/i, /one[\s-]*time\s*(pay|purchas)/i],
+            words:['lifetime','source','code','ip','ownership','codebase','infrastructure','pipeline','weights'],
+            answer:'The Lifetime plan is a one-time payment of <strong>$100,000</strong>. It includes everything in the monthly plan forever, plus: all ML models & source weights, strategy source code & logic, indicator codebase & formulas, signal generation pipeline, bot infrastructure & deployment configs, future updates, and <strong>full IP ownership</strong> of all delivered assets. Contact us at <a href="mailto:ratsignalcrypto@gmail.com" style="color:#ff6b2b;">ratsignalcrypto@gmail.com</a> for details.'
+        },
+        {
+            id:'contact',
+            patterns:[/contact/i, /reach\s*(out|you|us|them)/i, /talk\s*to\s*(a\s*)?(human|person|someone|agent)/i, /speak/i, /customer\s*(service|support)/i],
+            words:['contact','email','support','reach'],
+            answer:'You can reach our colleagues at <a href="mailto:ratsignalcrypto@gmail.com" style="color:#ff6b2b;">ratsignalcrypto@gmail.com</a> \u2014 they\'ll be happy to help with any questions!'
+        },
+        {
+            id:'how_works',
+            patterns:[/how\s*(does|do)\s*(it|this|ratsignal|things?)\s*work/i, /explain\s*how/i, /walk\s*me\s*through/i, /process/i, /step/i],
+            words:[],
+            answer:'Here\'s how it works: <strong>(1)</strong> Our ML model processes 5+ years of market data and 147 indicators to find profitable patterns. <strong>(2)</strong> It distills that into clear signals \u2014 when to open, close, or do nothing. <strong>(3)</strong> You receive real-time alerts in our premium Telegram group with entry zones, take profit, stop loss, and risk scores. One subscription, everything included!'
+        },
+        {
+            id:'thanks',
+            patterns:[/^(thanks?|thank\s*you|thx|ty|cheers|appreciate|cool|great|awesome|nice|perfect|ok|okay|got\s*it|understood|makes?\s*sense)\s*!?\.?$/i],
+            words:[],
+            answer:'You\'re welcome! Let me know if you have any other questions. \uD83D\uDE0A'
+        },
+        {
+            id:'bye',
+            patterns:[/^(bye|goodbye|see\s*ya|later|cya|good\s*night|gn)\s*!?\.?$/i],
+            words:[],
+            answer:'See you around! If you ever need anything, we\'re here. \uD83D\uDC4B'
+        }
+    ];
+
+    /* ---- Smart matching engine ---- */
+    function normalize(text){
+        return text.toLowerCase()
+            .replace(/[''`]/g,"'")
+            .replace(/[^a-z0-9\s'$&-]/g,' ')
+            .replace(/\s+/g,' ')
+            .trim();
+    }
+
+    function findAnswer(raw){
+        var text = normalize(raw);
+        var tokens = text.split(' ');
+
+        var scores = [];
+
+        for(var i=0;i<KB.length;i++){
+            var entry = KB[i];
+            var score = 0;
+
+            // Pattern (regex) matches - strongest signal
+            for(var p=0;p<entry.patterns.length;p++){
+                if(entry.patterns[p].test(raw) || entry.patterns[p].test(text)){
+                    score += 15;
+                    break; // one pattern match is enough
+                }
+            }
+
+            // Exact phrase matches in keys
+            if(entry.words){
+                for(var w=0;w<entry.words.length;w++){
+                    var word = entry.words[w];
+                    // Check if the word appears as a whole word
+                    var wordRe = new RegExp('\\b'+word.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&')+'\\b','i');
+                    if(wordRe.test(text)){
+                        score += word.length > 4 ? 5 : 3;
+                    }
+                }
+            }
+
+            // Bonus: if more than half the user tokens match entry words
+            if(entry.words && entry.words.length > 0){
+                var matchCount = 0;
+                for(var t=0;t<tokens.length;t++){
+                    if(tokens[t].length <= 2) continue;
+                    for(var w2=0;w2<entry.words.length;w2++){
+                        if(tokens[t] === entry.words[w2] || entry.words[w2].indexOf(tokens[t])===0){
+                            matchCount++;
+                            break;
+                        }
+                    }
+                }
+                if(tokens.length > 0 && matchCount / tokens.length > 0.4){
+                    score += 4;
+                }
+            }
+
+            if(score > 0) scores.push({entry:entry, score:score});
+        }
+
+        // Sort by score descending
+        scores.sort(function(a,b){ return b.score - a.score; });
+
+        // Need minimum confidence
+        if(scores.length > 0 && scores[0].score >= 5){
+            return scores[0].entry.answer;
+        }
+
+        return FALLBACK;
+    }
+
+    window.sendChatMessage=function(){
+        var text=input.value.trim();
+        if(!text)return;
+        input.value="";
+        appendMessage(text,"user");
+
+        sendBtn.disabled=true;
+        setTimeout(function(){
+            var reply=findAnswer(text);
+            appendMessage(reply,"bot");
+            sendBtn.disabled=false;
+            input.focus();
+        }, 300 + Math.random()*500);
+    };
+})();
+</script>
+</html>

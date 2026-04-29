@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatSignal | Dashboard</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/static/img/logo.png" type="image/png">
+
+    <style>
+        :root {
+            --bg-primary: #0a1628;
+            --bg-secondary: #0d1321;
+            --bg-card: rgba(13, 19, 33, 0.75);
+            --cyan: #00d4ff;
+            --cyan-dim: rgba(0, 212, 255, 0.15);
+            --orange: #ff8c00;
+            --negative: #ff3366;
+            --positive: #00e676;
+            --text-primary: #e8eaf6;
+            --text-secondary: rgba(160, 170, 200, 0.7);
+            --text-muted: rgba(100, 110, 140, 0.5);
+            --glass-border: rgba(100, 120, 180, 0.12);
+            --glass-border-hover: rgba(100, 120, 180, 0.25);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --font: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 15px; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .dash-nav {
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .dash-nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .dash-nav-brand img {
+            width: 32px;
+            height: 32px;
+        }
+        .dash-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .dash-nav-right a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .dash-nav-right a:hover {
+            color: var(--text-primary);
+        }
+        .dash-nav-right .btn-logout {
+            color: var(--negative);
+        }
+
+        .dash-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .dash-header {
+            margin-bottom: 32px;
+        }
+        .dash-header h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .dash-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .card-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(100, 120, 180, 0.06);
+        }
+        .status-row:last-child {
+            border-bottom: none;
+        }
+        .status-label {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+        }
+        .status-value {
+            font-weight: 600;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-active {
+            background: rgba(0, 230, 118, 0.12);
+            color: var(--positive);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+        }
+        .badge-trial {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        .badge-free {
+            background: rgba(100, 110, 140, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(100, 110, 140, 0.2);
+        }
+        .badge-cancelled, .badge-expired {
+            background: rgba(255, 51, 102, 0.12);
+            color: var(--negative);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+        }
+
+        .upgrade-cta {
+            text-align: center;
+            padding: 20px;
+        }
+        .btn-upgrade {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--cyan), #0099cc);
+            border: none;
+            border-radius: 8px;
+            color: #0a1628;
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-upgrade:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .payments-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .payments-table td {
+            padding: 10px 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(100, 120, 180, 0.06);
+            font-family: var(--font-mono);
+        }
+        .payments-table .amount {
+            color: var(--positive);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .flash-error {
+            background: rgba(255, 51, 102, 0.12);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            color: var(--negative);
+        }
+        .flash-success {
+            background: rgba(0, 230, 118, 0.12);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            color: var(--positive);
+        }
+        .flash-info {
+            background: var(--cyan-dim);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--cyan);
+        }
+
+        @media (max-width: 480px) {
+            .dash-container { padding: 24px 16px; }
+            .card { padding: 20px; }
+            .dash-nav { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="dash-nav">
+    <a href="/" class="dash-nav-brand">
+        <img src="/static/img/logo.png" alt="RatSignal">
+        <span>RatSignal</span>
+    </a>
+    <div class="dash-nav-right">
+        <a href="/">Trading Dashboard</a>
+        <a href="/auth/auto-trade" style="color:#ff6b2b;font-weight:600;">Auto-Trading</a>
+        <a href="/auth/logout" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<div class="dash-container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="dash-header">
+        <h1>Welcome, {{ current_user.display_name }}</h1>
+        <p>{{ current_user.email }}</p>
+    </div>
+
+    <!-- Subscription Status -->
+    <div class="card">
+        <div class="card-title">Subscription</div>
+
+        <div class="status-row">
+            <span class="status-label">Status</span>
+            <span class="status-value">
+                {% if current_user.subscription_status == 'active' %}
+                <span class="badge badge-active">Active</span>
+                {% elif current_user.subscription_status == 'trial' %}
+                <span class="badge badge-trial">Trial</span>
+                {% elif current_user.subscription_status == 'cancelled' %}
+                <span class="badge badge-cancelled">Cancelled</span>
+                {% elif current_user.subscription_status == 'expired' %}
+                <span class="badge badge-expired">Expired</span>
+                {% else %}
+                <span class="badge badge-free">Free</span>
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span class="status-label">Plan</span>
+            <span class="status-value">
+                {% if current_user.subscription_plan == 'lifetime' %}
+                Lifetime Access
+                {% elif current_user.subscription_plan == 'monthly' %}
+                Monthly ($100/mo)
+                {% else %}
+                --
+                {% endif %}
+            </span>
+        </div>
+
+        {% if current_user.subscription_end %}
+        <div class="status-row">
+            <span class="status-label">Renews / Expires</span>
+            <span class="status-value">{{ current_user.subscription_end[:10] }}</span>
+        </div>
+        {% endif %}
+
+        {% if current_user.subscription_status not in ('active', 'trial') %}
+        <div class="upgrade-cta">
+            <a href="/#section-pricing" class="btn-upgrade">Upgrade Now</a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% include "partials/copy_trader_card.html" %}
+
+    <!-- Payment History -->
+    <div class="card">
+        <div class="card-title">Payment History</div>
+
+        {% if payments and payments|length > 0 %}
+        <table class="payments-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Plan</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.created_at[:10] if p.created_at else '--' }}</td>
+                    <td>{{ p.plan|capitalize }}</td>
+                    <td class="amount">${{ "%.2f"|format(p.amount_cents / 100) }}</td>
+                    <td>{{ p.status|capitalize }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">No payments yet.</div>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>
