@@ -731,14 +731,22 @@
             </div>
             {% endif %}
             {% if request.args.get('test') == '1' %}
-            <div style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.08);border:1px dashed #06B6D4;border-radius:8px;">
-                <div style="font-size:0.8rem;color:#06B6D4;margin-bottom:10px;font-family:'JetBrains Mono',monospace;">// ADMIN TEST MODE - $1 / 1-day</div>
-                <div style="font-size:0.78rem;color:#8888a0;margin-bottom:10px;line-height:1.5;">
-                    Generates a NOWPayments invoice. On the next page you can pick <strong>any currency / chain</strong> they support (BTC, ETH, USDT on any chain, SOL, TRX, DOGE, …) and pay manually from any wallet.
+            <div data-plan-scope="test" style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.08);border:1px dashed #06B6D4;border-radius:8px;">
+                <div style="font-size:0.8rem;color:#06B6D4;margin-bottom:8px;font-family:'JetBrains Mono',monospace;">// ADMIN TEST MODE - $1 / 1-day</div>
+                <div class="currency-picker-wrap" data-currency-picker data-default="usdtmatic" style="margin:0 0 10px;">
+                    <div class="currency-picker-row">
+                        <select class="currency-select token-select" aria-label="Token">
+                            <option value="USDT">USDT</option>
+                        </select>
+                        <select class="currency-select chain-select" aria-label="Chain">
+                            <option value="usdtmatic">Polygon</option>
+                        </select>
+                    </div>
                 </div>
-                <form action="/payments/crypto-checkout" method="POST" style="display:inline;">
+                <form action="/payments/crypto-wallet-pay" method="POST" style="display:inline;">
                     <input type="hidden" name="plan" value="test">
-                    <button type="submit" style="padding:8px 16px;background:transparent;border:1px solid #06B6D4;border-radius:6px;color:#06B6D4;font-size:0.8rem;font-weight:600;cursor:pointer;">Test Subscribe ($1, 1-day access) — any chain</button>
+                    <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                    <button type="submit" style="padding:8px 16px;background:transparent;border:1px solid #06B6D4;border-radius:6px;color:#06B6D4;font-size:0.8rem;font-weight:600;cursor:pointer;">Test Subscribe ($1, 1-day access)</button>
                 </form>
             </div>
             {% endif %}

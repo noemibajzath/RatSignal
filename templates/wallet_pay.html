@@ -203,6 +203,11 @@
               blockExplorerUrls: chainCfg.blockExplorerUrls,
             }],
           });
+          // After adding, switch explicitly so the wallet activates it.
+          await provider.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: chainCfg.chainIdHex }],
+          });
         } else {
           throw e;
         }
@@ -315,6 +320,21 @@
         statusBox('<span class="spinner"></span>Switching to ' + chainCfg.chainName + '…', '');
         await ensureChain(provider);
 
+        // Verify the wallet really is on the expected chain — some wallets
+        // (especially WalletConnect-bridged mobile ones) silently ignore the
+        // switch request and would otherwise broadcast on the wrong chain,
+        // causing NOWPayments to never see the tx.
+        const actualChainId = await provider.request({ method: 'eth_chainId' });
+        if (actualChainId !== chainCfg.chainIdHex) {
+          statusBox(
+            'Wallet is on chain ' + actualChainId + ' but ' + chainCfg.chainName +
+            ' (' + chainCfg.chainIdHex + ') is required. ' +
+            'Switch networks manually in your wallet, then click Pay again.',
+            'error'
+          );
+          return;
+        }
+
         statusBox('<span class="spinner"></span>Requesting wallet permission…', '');
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         const from = accounts && accounts[0];
@@ -343,10 +363,16 @@
 
         document.getElementById('pay-btn').disabled = true;
         statusBox(
-          '<span class="spinner"></span>Transaction sent. Waiting for on-chain confirmation. ' +
+          '<span class="spinner"></span>Transaction sent. Verifying on chain… ' +
           '<a class="tx-link" target="_blank" href="' + chainCfg.explorerTxBase + txHash + '">View on explorer</a>',
           ''
         );
+
+        // Verify the wallet actually broadcast. We hit the chain's public RPC
+        // directly (no NOWPayments dependency yet) — this catches the case
+        // where the wallet returned a tx hash but never put it on the wire,
+        // which manifests as 'waiting forever' otherwise.
+        verifyTxOnChain(txHash);
       } catch (e) {
         console.error('Payment error:', e, 'code=', e && e.code, 'data=', e && e.data);
         const code = e && e.code;
@@ -359,6 +385,72 @@
         else if (code === -32603) friendly = 'Wallet internal error. Try switching to Polygon manually in your wallet first, then click Pay.';
         else if (/unauthorized/i.test(rawMsg)) friendly = 'Wallet returned Unauthorized. This usually means a second wallet extension is hijacking window.ethereum, or the connected account was revoked. Disable extra wallet extensions, refresh, and reconnect.';
         statusBox('Error: ' + friendly + (code ? ' <span style="opacity:0.6">(code ' + code + ')</span>' : ''), 'error');
+      }
+    }
+
+    async function rpcCall(method, params) {
+      // Try each rpc URL in chainCfg.rpcUrls until one responds.
+      for (const url of chainCfg.rpcUrls) {
+        try {
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+          });
+          if (!resp.ok) continue;
+          const j = await resp.json();
+          return j.result !== undefined ? j.result : null;
+        } catch (e) { /* try next */ }
+      }
+      return null;
+    }
+
+    async function verifyTxOnChain(txHash) {
+      const deadline = Date.now() + 60000; // 60 seconds
+      let everSeen = false;
+      while (Date.now() < deadline) {
+        const tx = await rpcCall('eth_getTransactionByHash', [txHash]);
+        if (tx) {
+          everSeen = true;
+          // Got tx in mempool/mined — check for receipt to detect revert.
+          const receipt = await rpcCall('eth_getTransactionReceipt', [txHash]);
+          if (receipt) {
+            if (receipt.status === '0x0') {
+              statusBox(
+                'Transaction reverted on chain. ' +
+                '<a class="tx-link" target="_blank" href="' + chainCfg.explorerTxBase + txHash + '">View on explorer</a> ' +
+                'and try again with a different wallet or token.',
+                'error'
+              );
+              document.getElementById('pay-btn').disabled = false;
+              return;
+            }
+            // Mined successfully — NOWPayments will pick it up shortly.
+            statusBox(
+              '<span class="spinner"></span>Transaction confirmed on chain. Waiting for NOWPayments to detect it (1-3 min)… ' +
+              '<a class="tx-link" target="_blank" href="' + chainCfg.explorerTxBase + txHash + '">View on explorer</a>',
+              ''
+            );
+            return;
+          }
+          // Tx in mempool but not mined yet — keep waiting.
+          statusBox(
+            '<span class="spinner"></span>Transaction in mempool. Waiting for it to be mined… ' +
+            '<a class="tx-link" target="_blank" href="' + chainCfg.explorerTxBase + txHash + '">View on explorer</a>',
+            ''
+          );
+        }
+        await new Promise(r => setTimeout(r, 4000));
+      }
+      // 60 s passed and we never saw the tx — wallet did not broadcast.
+      if (!everSeen) {
+        statusBox(
+          'We could not find your transaction on chain after 60 seconds. ' +
+          'Your wallet may have failed to broadcast. Check your wallet\'s ' +
+          'transaction history — if it does not show this tx, click Pay again.',
+          'error'
+        );
+        document.getElementById('pay-btn').disabled = false;
       }
     }
 
