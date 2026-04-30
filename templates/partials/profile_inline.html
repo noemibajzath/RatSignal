@@ -1,0 +1,1699 @@
+{# AJAX-loaded inline version of profile.html — same body content, no #}
+{# nav (the homepage already has a nav) and CSS scoped via profile- #}
+{# class names (already namespaced, so just include as-is). #}
+<style>
+:root {
+            --bg-dark: #0a1628;
+            --bg-card: #0f1f35;
+            --bg-card-hover: #162842;
+            --accent-orange: #ff6b2b;
+            --accent-cyan: #06B6D4;
+            --accent-green: #00e676;
+            --accent-red: #ff4757;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --border: #1a2d4a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Nav */
+        .nav-right { display: flex; gap: 32px; align-items: center; }
+        .nav-right a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-right a:hover { color: var(--accent-cyan); }
+        .nav-logout {
+            color: #ff4757 !important;
+            border: 1px solid #ff4757;
+            padding: 9px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .nav-logout:hover {
+            transform: translateY(-1px);
+            background: rgba(255,71,87,0.1);
+            box-shadow: 0 4px 16px rgba(255,71,87,0.25);
+        }
+
+        /* Content */
+        .profile-container {
+            max-width: 800px;
+            margin: 48px auto;
+            padding: 0 24px;
+        }
+        .profile-header {
+            margin-bottom: 32px;
+        }
+        .profile-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .profile-header h1 span { color: var(--accent-orange); }
+        .profile-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Flash messages */
+        .flash { padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+        .flash-success { background: rgba(0,230,118,0.1); border: 1px solid var(--accent-green); color: var(--accent-green); }
+        .flash-error { background: rgba(255,71,87,0.1); border: 1px solid var(--accent-red); color: var(--accent-red); }
+        .flash-info { background: rgba(6,182,212,0.1); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); }
+
+        /* Cards */
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .profile-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .info-value.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .info-value.highlight { color: var(--accent-orange); }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-free {
+            background: rgba(136,136,160,0.15);
+            color: var(--text-secondary);
+            border: 1px solid var(--text-muted);
+        }
+        .status-active {
+            background: rgba(0,230,118,0.15);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        /* Payments table */
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .payments-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .payments-table td {
+            padding: 12px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .no-data {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 24px;
+        }
+
+        /* Telegram info */
+        .telegram-notice {
+            background: rgba(6,182,212,0.08);
+            border: 1px solid rgba(6,182,212,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .telegram-notice strong { color: var(--accent-cyan); }
+
+        /* Trial CTA - green, prominent */
+        .trial-cta-wrap {
+            margin-top: 20px;
+            margin-bottom: 16px;
+        }
+        .trial-cta {
+            padding: 22px 24px;
+            background: linear-gradient(135deg, rgba(0,230,118,0.12), rgba(6,182,212,0.06));
+            border: 1px solid rgba(0,230,118,0.4);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .trial-cta-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+        .trial-cta-sub {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+        .trial-cta-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: var(--accent-green);
+            border: none;
+            border-radius: 8px;
+            color: #051a12;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .trial-cta-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0,230,118,0.25);
+        }
+
+        /* Active subscription countdown */
+        .sub-countdown {
+            margin-top: 18px;
+            padding: 16px 20px;
+            background: rgba(0,230,118,0.06);
+            border: 1px solid rgba(0,230,118,0.25);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .sub-countdown-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sub-countdown-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        /* Expired notice */
+        .sub-expired {
+            margin-top: 18px;
+            padding: 18px 20px;
+            background: rgba(255,71,87,0.08);
+            border: 1px solid rgba(255,71,87,0.35);
+            border-radius: 10px;
+        }
+        .sub-expired-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ff4757;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+        .sub-expired-sub {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+        .sub-expired-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: var(--accent-orange);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .sub-expired-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(255,107,43,0.35);
+        }
+
+        /* Subscription CTA / wallet grid */
+        .sub-cta {
+            margin-top: 24px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(255,107,43,0.08), rgba(255,143,94,0.04));
+            border: 1px solid rgba(255,107,43,0.25);
+            border-radius: 12px;
+        }
+        .sub-cta-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .sub-cta-sub {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .sub-cta-refund {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            background: rgba(6, 182, 212, 0.06);
+            border-left: 2px solid var(--accent-cyan);
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .sub-cta-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0 14px;
+        }
+        .sub-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.2px;
+        }
+        .sub-badge-green {
+            background: rgba(0, 230, 118, 0.14);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 230, 118, 0.4);
+            box-shadow: 0 0 18px rgba(0, 230, 118, 0.15);
+        }
+        .sub-badge-cyan {
+            background: rgba(6, 182, 212, 0.14);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+        }
+        .sub-badge-lg {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+        .wallet-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .plan-picker {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .plan-tab {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s, background 0.15s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+        }
+        .plan-tab:hover {
+            border-color: rgba(255, 107, 43, 0.4);
+            background: rgba(255, 107, 43, 0.04);
+        }
+        .plan-tab.active {
+            border-color: var(--accent-orange);
+            background: rgba(255, 107, 43, 0.08);
+            box-shadow: 0 0 0 2px rgba(255, 107, 43, 0.2);
+        }
+        .plan-tab .plan-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .plan-tab.active .plan-name { color: var(--text-primary); }
+        .plan-tab .plan-save {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--accent-green);
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .plan-tab .plan-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+        }
+        .plan-tab .plan-price span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-left: 2px;
+        }
+        .currency-picker-wrap { margin: 18px 0 14px; }
+        .currency-picker-label {
+            display: block;
+            font-size: 0.74rem;
+            color: var(--text-secondary, #8888a0);
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .currency-picker-row { display: flex; gap: 10px; }
+        .currency-picker-row .currency-select { flex: 1; min-width: 0; }
+        @media (max-width: 460px) { .currency-picker-row { flex-direction: column; } }
+        .currency-select {
+            width: 100%;
+            padding: 12px 40px 12px 14px;
+            background: rgba(6,182,212,0.06);
+            border: 1px solid rgba(6,182,212,0.25);
+            border-radius: 10px;
+            color: #f0f0f5;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%2306B6D4' d='M6 8L0 0h12z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        .currency-select:focus { outline: none; border-color: #06B6D4; }
+        .currency-select option { background: #0a1628; color: #f0f0f5; }
+        .currency-select optgroup { color: #ff6b2b; font-weight: 600; }
+        .currency-select:disabled { opacity: 0.5; cursor: not-allowed; }
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+            gap: 12px;
+        }
+        .wallet-form { display: contents; margin: 0; }
+        .wallet-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s, background 0.15s;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+        .wallet-btn:hover {
+            background: rgba(255,107,43,0.08);
+            border-color: rgba(255,107,43,0.45);
+            transform: translateY(-2px);
+        }
+        .wallet-btn img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .wallet-btn span {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .wallet-btn:hover span {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .profile-container { margin: 24px auto; }
+            .wallet-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+        }
+
+        .profile-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(10, 22, 40, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .profile-input:focus {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(255, 107, 43, 0.2);
+        }
+        .profile-input.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+</style>
+
+<div id="profile-inline">
+<div class="profile-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="profile-header">
+            <h1>Welcome, <span>{{ (user or {}).get('first_name') or (user or {}).get('display_name') or 'Rat' }}</span></h1>
+            <p>Your RatSignal account overview</p>
+        </div>
+
+        <!-- SUBSCRIPTION CARD (moved to top) -->
+        <div class="profile-card">
+            <h2>Subscription</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Status</span>
+                    {% if user.get('subscription_status') == 'active' %}
+                    <span class="status-badge status-active">Active</span>
+                    {% elif user.get('subscription_status') == 'expired' %}
+                    <span class="status-badge status-free">Inactive</span>
+                    {% else %}
+                    <span class="status-badge status-free">Free</span>
+                    {% endif %}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Plan</span>
+                    <span class="info-value">{{ user.get('subscription_plan', 'None') or 'None' }}</span>
+                </div>
+                {% if user.get('subscription_end') and user.get('subscription_status') in ('active', 'expired') %}
+                <div class="info-item">
+                    <span class="info-label">Subscription ends on</span>
+                    <span class="info-value">{{ user.get('subscription_end')[:10] }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if user.get('subscription_status') == 'active' and user.get('subscription_end') %}
+            <div class="sub-countdown" data-sub-end="{{ user.get('subscription_end') }}">
+                <span class="sub-countdown-label">Time left</span>
+                <span class="sub-countdown-value" data-sub-countdown>-</span>
+            </div>
+            {% elif user.get('subscription_status') == 'expired' %}
+            <div class="sub-expired">
+                <div class="sub-expired-title">Subscription expired</div>
+                <div class="sub-expired-sub">Your access has ended. Subscribe now to keep receiving live signals.</div>
+                <a href="#paid-cta" class="sub-expired-btn">Subscribe Now</a>
+            </div>
+            {% endif %}
+
+            {% if user.get('subscription_status') != 'active' and not user.get('trial_used') %}
+            <form action="/payments/start-trial" method="POST" class="trial-cta-wrap">
+                <div class="trial-cta">
+                    <div class="trial-cta-title">Start your 7-day free trial</div>
+                    <div class="trial-cta-sub">Full access to live signals for 7 days - no card, no crypto.</div>
+                    <button type="submit" class="trial-cta-btn">Start Free Trial Now</button>
+                </div>
+            </form>
+            {% endif %}
+
+            {% if user.get('subscription_status') != 'active' %}
+            <div class="sub-cta" id="paid-cta" data-plan-scope="profile">
+                <div class="sub-cta-title">Unlock live signals</div>
+                <div class="sub-cta-badges">
+                    <span class="sub-badge sub-badge-green">7-day free trial</span>
+                </div>
+                <div class="plan-picker">
+                    <button type="button" class="plan-tab active" data-plan="monthly" data-summary="$100/month">
+                        <div class="plan-name">Monthly</div>
+                        <div class="plan-price">$100<span>/mo</span></div>
+                    </button>
+                    <button type="button" class="plan-tab" data-plan="yearly" data-summary="$990/year">
+                        <div class="plan-name">Yearly <span class="plan-save">Save $210</span></div>
+                        <div class="plan-price">$990<span>/yr</span></div>
+                    </button>
+                </div>
+
+                <div class="currency-picker-wrap" data-currency-picker data-default="usdtmatic">
+                    <label class="currency-picker-label">Pay with</label>
+                    <div class="currency-picker-row">
+                        <select class="currency-select token-select" aria-label="Token">
+                            <option value="USDT">USDT</option>
+                        </select>
+                        <select class="currency-select chain-select" aria-label="Chain">
+                            <option value="usdtmatic">Polygon</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="wallet-label">Choose your wallet</div>
+                <div class="wallet-grid">
+                    <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                        <input type="hidden" name="plan" value="monthly" class="plan-input">
+                        <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                        <input type="hidden" name="wallet_hint" value="metamask">
+                        <button type="submit" class="wallet-btn" title="MetaMask">
+                            <img src="/static/wallets/metamask.svg" alt="MetaMask">
+                            <span>MetaMask</span>
+                        </button>
+                    </form>
+                    <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                        <input type="hidden" name="plan" value="monthly" class="plan-input">
+                        <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                        <input type="hidden" name="wallet_hint" value="rabby">
+                        <button type="submit" class="wallet-btn" title="Rabby">
+                            <img src="/static/wallets/rabby.png" alt="Rabby">
+                            <span>Rabby</span>
+                        </button>
+                    </form>
+                    <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                        <input type="hidden" name="plan" value="monthly" class="plan-input">
+                        <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                        <input type="hidden" name="wallet_hint" value="phantom">
+                        <button type="submit" class="wallet-btn" title="Phantom">
+                            <img src="/static/wallets/phantom.svg" alt="Phantom">
+                            <span>Phantom</span>
+                        </button>
+                    </form>
+                    <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                        <input type="hidden" name="plan" value="monthly" class="plan-input">
+                        <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                        <input type="hidden" name="wallet_hint" value="safe">
+                        <button type="submit" class="wallet-btn" title="Safe">
+                            <img src="/static/wallets/safe.svg" alt="Safe">
+                            <span>Safe</span>
+                        </button>
+                    </form>
+                    <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                        <input type="hidden" name="plan" value="monthly" class="plan-input">
+                        <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                        <input type="hidden" name="wallet_hint" value="walletconnect">
+                        <button type="submit" class="wallet-btn" title="WalletConnect">
+                            <img src="/static/wallets/walletconnect.svg" alt="WalletConnect">
+                            <span>WalletConnect</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                <form action="/payments/crypto-wallet-pay" method="POST" style="display:inline;">
+                    <input type="hidden" name="plan" value="monthly">
+                    <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                    <button type="submit" style="padding:10px 24px;background:transparent;border:1px solid #ff6b2b;border-radius:8px;color:#ff6b2b;font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;">Renew Subscription</button>
+                </form>
+                {% if refund_eligible and user.get('subscription_plan') != 'trial' %}
+                <button type="button" id="open-refund-modal" class="refund-link-btn">
+                    Cancel &amp; request refund
+                    {% if refund_hours_left is not none %}
+                    <span class="refund-hours-left">({{ (refund_hours_left // 24) if refund_hours_left >= 24 else refund_hours_left }}{{ 'd' if refund_hours_left >= 24 else 'h' }} left)</span>
+                    {% endif %}
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if request.args.get('test') == '1' %}
+            <div data-plan-scope="test" style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.08);border:1px dashed #06B6D4;border-radius:8px;">
+                <div style="font-size:0.8rem;color:#06B6D4;margin-bottom:8px;font-family:'JetBrains Mono',monospace;">// ADMIN TEST MODE - $1 / 1-day</div>
+                <div class="currency-picker-wrap" data-currency-picker data-default="usdtmatic" style="margin:0 0 10px;">
+                    <div class="currency-picker-row">
+                        <select class="currency-select token-select" aria-label="Token">
+                            <option value="USDT">USDT</option>
+                        </select>
+                        <select class="currency-select chain-select" aria-label="Chain">
+                            <option value="usdtmatic">Polygon</option>
+                        </select>
+                    </div>
+                </div>
+                <form action="/payments/crypto-wallet-pay" method="POST" style="display:inline;">
+                    <input type="hidden" name="plan" value="test">
+                    <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                    <button type="submit" style="padding:8px 16px;background:transparent;border:1px solid #06B6D4;border-radius:6px;color:#06B6D4;font-size:0.8rem;font-weight:600;cursor:pointer;">Test Subscribe ($1, 1-day access)</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <div class="telegram-notice" style="margin-top:20px;">
+                <strong>Telegram Signal Group:</strong> Our team will add you to the Premium Signal Group within 24 hours of registration. You'll receive real-time alerts straight to your Telegram.
+            </div>
+        </div>
+
+        <!-- PERSONAL INFO CARD -->
+        <div class="profile-card">
+            <h2>Personal Info</h2>
+            <div id="profile-view">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">First Name</span>
+                        <span class="info-value">{{ user.get('first_name', '') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Name</span>
+                        <span class="info-value">{{ user.get('last_name', '') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value mono">{{ user.get('email', '') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Telegram</span>
+                        <span class="info-value highlight">{{ ('@' + user.get('telegram', '').lstrip('@')) if user.get('telegram') else 'Not set' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Discord</span>
+                        <span class="info-value highlight">{{ user.get('discord', '') or 'Not set' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Wallet Address</span>
+                        <span class="info-value mono">{{ user.get('wallet_address', '') or 'Not provided' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Member Since</span>
+                        <span class="info-value">{{ user.get('created_at', '')[:10] }}</span>
+                    </div>
+                </div>
+                <button onclick="toggleEdit(true)" style="margin-top:20px;padding:10px 24px;background:linear-gradient(135deg,#ff6b2b,#ff8f5e);border:none;border-radius:8px;color:white;font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:transform 0.15s;">Edit Profile</button>
+            </div>
+            <form id="profile-edit" method="POST" action="/auth/profile" style="display:none;">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label class="info-label" for="edit-first_name">First Name</label>
+                        <input type="text" id="edit-first_name" name="first_name" value="{{ user.get('first_name', '') }}" class="profile-input">
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label" for="edit-last_name">Last Name</label>
+                        <input type="text" id="edit-last_name" name="last_name" value="{{ user.get('last_name', '') }}" class="profile-input">
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label" for="edit-email">Email</label>
+                        <input type="email" id="edit-email" name="email" value="{{ user.get('email', '') }}" class="profile-input">
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label" for="edit-telegram">Telegram</label>
+                        <input type="text" id="edit-telegram" name="telegram" value="{{ user.get('telegram', '') }}" placeholder="yourusername" class="profile-input">
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label" for="edit-discord">Discord</label>
+                        <input type="text" id="edit-discord" name="discord" value="{{ user.get('discord', '') }}" placeholder="yourusername" class="profile-input">
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label" for="edit-wallet">Wallet Address</label>
+                        <input type="text" id="edit-wallet" name="wallet_address" value="{{ user.get('wallet_address', '') }}" placeholder="0x... or ENS" class="profile-input mono">
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:20px;">
+                    <button type="submit" style="padding:10px 24px;background:linear-gradient(135deg,#ff6b2b,#ff8f5e);border:none;border-radius:8px;color:white;font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;">Save Changes</button>
+                    <button type="button" onclick="toggleEdit(false)" style="padding:10px 24px;background:transparent;border:1px solid #1e1e2e;border-radius:8px;color:#8888a0;font-size:0.85rem;cursor:pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PAYMENT HISTORY CARD -->
+        <div class="profile-card">
+            <h2>Payment History</h2>
+            {% if payments %}
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ p.created_at[:10] }}</td>
+                        <td>{{ p.plan }}</td>
+                        <td class="mono">${{ '%.2f' % (p.amount_cents / 100) }}</td>
+                        <td>{{ p.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">No payments yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+{% if refund_eligible and user.get('subscription_plan') != 'trial' %}
+<!-- Cancel & refund modal -->
+<div id="refund-modal-overlay" class="refund-modal-overlay">
+    <div class="refund-modal">
+        <button type="button" class="refund-modal-close" id="refund-modal-close" aria-label="Close">&times;</button>
+        <h2 class="refund-modal-title">Cancel &amp; request refund</h2>
+        <p class="refund-modal-desc">You're within the 7-day refund window. Submitting this form will end your subscription access immediately. We'll return the full amount to the wallet below within 24 hours.</p>
+        <form id="refund-form" action="/payments/cancel-refund" method="POST">
+            <label class="refund-label" for="refund-wallet-input">Refund wallet address</label>
+            <input type="text" id="refund-wallet-input" name="refund_wallet" class="refund-input" placeholder="0x... (USDT on Polygon)" required minlength="10" autocomplete="off">
+            <div class="refund-hint">Usually the same wallet you paid from. USDT will be sent on Polygon.</div>
+
+            <label class="refund-label" for="refund-reason-input">Reason (optional)</label>
+            <textarea id="refund-reason-input" name="reason" class="refund-input refund-textarea" rows="3" placeholder="Help us improve - why did you cancel?"></textarea>
+
+            <div class="refund-actions">
+                <button type="button" id="refund-modal-cancel" class="refund-btn refund-btn-ghost">Keep subscription</button>
+                <button type="submit" id="refund-submit-btn" class="refund-btn refund-btn-danger">Cancel &amp; refund</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.refund-link-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 71, 87, 0.35);
+    color: #ff8898;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.refund-link-btn:hover {
+    background: rgba(255, 71, 87, 0.08);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+.refund-hours-left {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+}
+.refund-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 600;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.refund-modal-overlay.visible { display: flex; }
+.refund-modal {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    border-radius: 16px;
+    padding: 36px 32px 28px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.refund-modal-close {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+.refund-modal-close:hover { color: var(--text-primary); background: rgba(255,255,255,0.06); }
+.refund-modal-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent-red);
+    margin-bottom: 10px;
+}
+.refund-modal-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin-bottom: 22px;
+}
+.refund-label {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    margin-top: 14px;
+}
+.refund-label:first-of-type { margin-top: 0; }
+.refund-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(10, 22, 40, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.refund-input:focus {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.15);
+}
+.refund-textarea {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 60px;
+}
+.refund-hint {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+.refund-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+.refund-btn {
+    flex: 1;
+    min-width: 160px;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.15s, border-color 0.15s;
+}
+.refund-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+.refund-btn-ghost:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+.refund-btn-danger {
+    background: linear-gradient(135deg, #ff4757, #ff6670);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 20px rgba(255, 71, 87, 0.3);
+}
+.refund-btn-danger:hover:not(:disabled) { transform: translateY(-1px); }
+.refund-btn-danger:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>
+{% endif %}
+
+{% if needs_profile_completion %}
+<!-- Blocking modal: social-login users must fill in email + real name before doing anything else. -->
+<div id="profile-complete-overlay" class="profile-complete-overlay">
+    <form id="profile-complete-form" class="profile-complete-modal" method="POST" action="/auth/complete-profile" autocomplete="on">
+        <div class="profile-complete-ribbon"></div>
+        <h2>Complete your profile</h2>
+        <p class="profile-complete-desc">We need a real email and name for your RatSignal account so you can receive payment receipts, subscription reminders, and access the premium signal group.</p>
+
+        <div class="profile-complete-row">
+            <label for="pc-first-name">First name</label>
+            <input type="text" id="pc-first-name" name="first_name" placeholder="Jane"
+                   value="{{ user.get('first_name') or '' }}" required autofocus>
+        </div>
+        <div class="profile-complete-row">
+            <label for="pc-last-name">Last name</label>
+            <input type="text" id="pc-last-name" name="last_name" placeholder="Doe"
+                   value="{{ user.get('last_name') or '' }}" required>
+        </div>
+        <div class="profile-complete-row">
+            <label for="pc-email">Email address</label>
+            <input type="email" id="pc-email" name="email" placeholder="you@example.com"
+                   value="{% if user.get('email') and '@ratsignal.local' not in user.get('email') %}{{ user.get('email') }}{% endif %}" required>
+            <div class="profile-complete-hint">We'll send payment receipts and renewal reminders here.</div>
+        </div>
+
+        <div id="pc-merge-panel" style="display:none;margin:4px 0 14px;padding:12px 14px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.3);border-radius:10px;">
+            <div id="pc-merge-msg" style="font-size:0.85rem;color:#06B6D4;margin-bottom:10px;line-height:1.5;"></div>
+            <label for="pc-merge-password" style="display:block;font-size:0.72rem;color:#8888a0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;font-weight:600;">Password for the existing account</label>
+            <input type="password" id="pc-merge-password" name="merge_password" placeholder="••••••••"
+                   style="width:100%;padding:12px 14px;background:rgba(10,22,40,0.7);border:1px solid #1a2d4a;border-radius:10px;color:#f0f0f5;font-family:'Inter',sans-serif;font-size:0.95rem;outline:none;">
+        </div>
+
+        <div id="pc-error" class="profile-complete-error" style="display:none;"></div>
+
+        <button type="submit" id="pc-submit" class="profile-complete-btn">Save and continue →</button>
+    </form>
+</div>
+<style>
+.profile-complete-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5, 8, 16, 0.92);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: pc-fade 0.2s ease-out;
+}
+@keyframes pc-fade { from { opacity: 0; } to { opacity: 1; } }
+.profile-complete-modal {
+    position: relative;
+    background: #0f1f35;
+    border: 1px solid #1a2d4a;
+    border-radius: 18px;
+    padding: 36px 32px 28px;
+    width: 100%;
+    max-width: 460px;
+    color: #f0f0f5;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+}
+.profile-complete-ribbon {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+    border-radius: 18px 18px 0 0;
+}
+.profile-complete-modal h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.35rem; font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.profile-complete-desc {
+    color: #8888a0; font-size: 0.9rem; line-height: 1.55;
+    margin-bottom: 22px;
+}
+.profile-complete-row { margin-bottom: 14px; }
+.profile-complete-row label {
+    display: block;
+    font-size: 0.75rem; font-weight: 600;
+    color: #8888a0;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.profile-complete-row input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(10, 22, 40, 0.7);
+    border: 1px solid #1a2d4a;
+    border-radius: 10px;
+    color: #f0f0f5;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.profile-complete-row input:focus {
+    border-color: #ff6b2b;
+    box-shadow: 0 0 0 3px rgba(255,107,43,0.22);
+}
+.profile-complete-hint {
+    font-size: 0.72rem; color: #55556a;
+    margin-top: 4px;
+}
+.profile-complete-btn {
+    display: block; width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    background: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+    border: none; border-radius: 10px;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700; font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+}
+.profile-complete-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 22px rgba(255,107,43,0.4); }
+.profile-complete-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.profile-complete-error {
+    margin: 4px 0 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.3);
+    color: #ff4757;
+    font-size: 0.82rem;
+}
+body.pc-locked { overflow: hidden; }
+</style>
+<script>
+(function() {
+    console.log('[RatSignal] Complete-profile modal init');
+    document.body.classList.add('pc-locked');
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
+    var form = document.getElementById('profile-complete-form');
+    var btn  = document.getElementById('pc-submit');
+    var err  = document.getElementById('pc-error');
+    if (!form || !btn) { console.error('[RatSignal] complete-profile form missing'); return; }
+
+    function showErr(msg) {
+        err.textContent = msg;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Save and continue →';
+    }
+
+    form.addEventListener('submit', function(ev) {
+        ev.preventDefault();  // we use fetch so we see errors inline
+        err.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+        var fd = new FormData(form);
+        console.log('[RatSignal] Submitting:',
+            Object.fromEntries(fd.entries()));
+        fetch('/auth/complete-profile', {
+            method: 'POST',
+            body: fd,
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' },
+        }).then(function(resp) {
+            console.log('[RatSignal] Response:', resp.status);
+            return resp.json().then(function(data) { return { status: resp.status, data: data }; });
+        }).then(function(r) {
+            if (r.data && r.data.ok) {
+                window.location.href = r.data.redirect || '/auth/profile';
+                return;
+            }
+            if (r.data && r.data.merge_required) {
+                // Email belongs to an existing account - reveal the password field
+                // so the user can prove ownership and we can merge the two accounts.
+                var panel = document.getElementById('pc-merge-panel');
+                var msg = document.getElementById('pc-merge-msg');
+                var pw  = document.getElementById('pc-merge-password');
+                if (msg) msg.innerHTML = r.data.message || 'Enter password to link accounts.';
+                if (panel) panel.style.display = 'block';
+                if (pw) { pw.required = true; pw.focus(); }
+                btn.disabled = false;
+                btn.textContent = 'Merge and sign in →';
+                err.style.display = 'none';
+                return;
+            }
+            showErr((r.data && r.data.error) || ('Server returned ' + r.status));
+        }).catch(function(e) {
+            console.error('[RatSignal] complete-profile fetch error:', e);
+            showErr('Network error: ' + e.message + '. Please retry.');
+        });
+    });
+})();
+</script>
+{% endif %}
+
+{% if user.get('subscription_status') != 'active' and not needs_profile_completion and (user.get('telegram_id') or user.get('discord_id')) %}
+<!-- Auto-show Subscription Modal for non-subscribed users (skipped for email-registered users - they already see the inline CTA) -->
+<div id="sub-modal-overlay" class="sub-modal-overlay">
+    <div class="sub-modal" data-plan-scope="modal">
+        <button type="button" class="sub-modal-close" aria-label="Close" id="sub-modal-close">&times;</button>
+        <div class="sub-modal-ribbon"></div>
+        <div class="sub-modal-emoji">🐀</div>
+        <h2 class="sub-modal-title">Ready to unlock <span>RatSignal</span>?</h2>
+        <div class="sub-modal-badges">
+            <span class="sub-badge sub-badge-green sub-badge-lg">7-day free trial</span>
+        </div>
+        <p class="sub-modal-desc">Pay once, try it for 7 days. Not for you? Cancel in the first week and we refund the full amount to your wallet within 24 hours.</p>
+        <ul class="sub-modal-features">
+            <li><span>✓</span> Live signals from ATLAS, Arbitrage &amp; Smart Money bots</li>
+            <li><span>✓</span> Real-time PnL dashboard (8 subaccounts on Lighter)</li>
+            <li><span>✓</span> Premium Telegram alerts within 24h</li>
+            <li><span>✓</span> Full refund to your wallet if you cancel in 7 days</li>
+        </ul>
+        <div class="sub-modal-price" data-plan-price><span data-plan-amount>$100</span><span data-plan-period>/month</span></div>
+
+        <div class="plan-picker">
+            <button type="button" class="plan-tab active" data-plan="monthly" data-summary="$100/month" data-amount="$100" data-period="/month">
+                <div class="plan-name">Monthly</div>
+                <div class="plan-price">$100<span>/mo</span></div>
+            </button>
+            <button type="button" class="plan-tab" data-plan="yearly" data-summary="$990/year" data-amount="$990" data-period="/year">
+                <div class="plan-name">Yearly <span class="plan-save">Save $210</span></div>
+                <div class="plan-price">$990<span>/yr</span></div>
+            </button>
+        </div>
+
+        <div class="currency-picker-wrap" data-currency-picker data-default="usdtmatic">
+            <label class="currency-picker-label">Pay with</label>
+            <div class="currency-picker-row">
+                <select class="currency-select token-select" aria-label="Token">
+                    <option value="USDT">USDT</option>
+                </select>
+                <select class="currency-select chain-select" aria-label="Chain">
+                    <option value="usdtmatic">Polygon</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="sub-modal-wallet-label">Pick your wallet to continue</div>
+        <div class="wallet-grid sub-modal-wallet-grid">
+            <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                <input type="hidden" name="plan" value="monthly" class="plan-input">
+                <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                <input type="hidden" name="wallet_hint" value="metamask">
+                <button type="submit" class="wallet-btn" title="MetaMask">
+                    <img src="/static/wallets/metamask.svg" alt="MetaMask">
+                    <span>MetaMask</span>
+                </button>
+            </form>
+            <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                <input type="hidden" name="plan" value="monthly" class="plan-input">
+                <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                <input type="hidden" name="wallet_hint" value="rabby">
+                <button type="submit" class="wallet-btn" title="Rabby">
+                    <img src="/static/wallets/rabby.png" alt="Rabby">
+                    <span>Rabby</span>
+                </button>
+            </form>
+            <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                <input type="hidden" name="plan" value="monthly" class="plan-input">
+                <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                <input type="hidden" name="wallet_hint" value="phantom">
+                <button type="submit" class="wallet-btn" title="Phantom">
+                    <img src="/static/wallets/phantom.svg" alt="Phantom">
+                    <span>Phantom</span>
+                </button>
+            </form>
+            <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                <input type="hidden" name="plan" value="monthly" class="plan-input">
+                <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                <input type="hidden" name="wallet_hint" value="safe">
+                <button type="submit" class="wallet-btn" title="Safe">
+                    <img src="/static/wallets/safe.svg" alt="Safe">
+                    <span>Safe</span>
+                </button>
+            </form>
+            <form action="/payments/crypto-wallet-pay" method="POST" class="wallet-form">
+                <input type="hidden" name="plan" value="monthly" class="plan-input">
+                <input type="hidden" name="pay_currency" value="usdtmatic" class="pay-currency-input">
+                <input type="hidden" name="wallet_hint" value="walletconnect">
+                <button type="submit" class="wallet-btn" title="WalletConnect">
+                    <img src="/static/wallets/walletconnect.svg" alt="WalletConnect">
+                    <span>WalletConnect</span>
+                </button>
+            </form>
+        </div>
+        <button type="button" class="sub-modal-later" id="sub-modal-later">Maybe later</button>
+    </div>
+</div>
+
+<style>
+.sub-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 16, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: subOverlayIn 0.25s ease;
+}
+.sub-modal-overlay.visible { display: flex; }
+@keyframes subOverlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.sub-modal {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 107, 43, 0.3);
+    border-radius: 20px;
+    padding: 42px 36px 32px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(255, 107, 43, 0.15);
+    animation: subModalIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes subModalIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.sub-modal-ribbon {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b2b, #ff8f5e, #06B6D4);
+    border-radius: 20px 20px 0 0;
+}
+.sub-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+}
+.sub-modal-close:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+.sub-modal-emoji {
+    font-size: 2.4rem;
+    text-align: center;
+    margin-bottom: 8px;
+}
+.sub-modal-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+.sub-modal-title span {
+    background: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.sub-modal-desc {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin-bottom: 22px;
+}
+.sub-modal-features {
+    list-style: none;
+    padding: 18px 20px;
+    background: rgba(6, 182, 212, 0.05);
+    border: 1px solid rgba(6, 182, 212, 0.15);
+    border-radius: 12px;
+    margin-bottom: 22px;
+}
+.sub-modal-features li {
+    font-size: 0.87rem;
+    color: var(--text-secondary);
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sub-modal-features li span {
+    color: var(--accent-green);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.sub-modal-badges {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 4px 0 18px;
+}
+.sub-modal-price {
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+    margin-bottom: 4px;
+}
+.sub-modal-price span {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-left: 4px;
+}
+.sub-modal-price .sub-modal-price-after {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+}
+.sub-modal-wallet-label {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 14px;
+}
+.sub-modal-wallet-grid {
+    margin-bottom: 20px;
+}
+.sub-modal-later {
+    display: block;
+    margin: 0 auto;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+}
+.sub-modal-later:hover { color: var(--text-secondary); }
+
+@media (max-width: 520px) {
+    .sub-modal { padding: 36px 20px 24px; border-radius: 16px; }
+    .sub-modal-title { font-size: 1.25rem; }
+    .sub-modal-features { padding: 14px 16px; }
+    .sub-modal-price { font-size: 1.7rem; }
+}
+</style>
+{% endif %}
+
+<script>
+function toggleEdit(show) {
+    document.getElementById('profile-view').style.display = show ? 'none' : 'block';
+    document.getElementById('profile-edit').style.display = show ? 'block' : 'none';
+}
+
+(function() {
+    var rOpen = document.getElementById('open-refund-modal');
+    var rOverlay = document.getElementById('refund-modal-overlay');
+    if (!rOpen || !rOverlay) return;
+    var rClose = document.getElementById('refund-modal-close');
+    var rCancel = document.getElementById('refund-modal-cancel');
+    var rForm = document.getElementById('refund-form');
+    var rWallet = document.getElementById('refund-wallet-input');
+    var rSubmit = document.getElementById('refund-submit-btn');
+    function show() { rOverlay.classList.add('visible'); document.body.style.overflow = 'hidden'; if (rWallet) rWallet.focus(); }
+    function hide() { rOverlay.classList.remove('visible'); document.body.style.overflow = ''; }
+    rOpen.addEventListener('click', show);
+    if (rClose) rClose.addEventListener('click', hide);
+    if (rCancel) rCancel.addEventListener('click', hide);
+    rOverlay.addEventListener('click', function(e) { if (e.target === rOverlay) hide(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && rOverlay.classList.contains('visible')) hide(); });
+    if (rForm && rSubmit) rForm.addEventListener('submit', function() { rSubmit.disabled = true; rSubmit.textContent = 'Submitting...'; });
+})();
+
+// Currency picker - two dropdowns: token ticker, then chain. Loads the EVM
+// list from /payments/currencies, pivots to {ticker: [{code, network, label}]},
+// and syncs all hidden pay_currency inputs within the same plan-scope.
+(function() {
+    var pickers = document.querySelectorAll('[data-currency-picker]');
+    if (!pickers.length) return;
+
+    // Popular tickers surface at the top of the token dropdown. Everything
+    // else is appended alphabetically.
+    var POPULAR = ['USDT','USDC','DAI','ETH','BNB','POL','MATIC','BUSD','FDUSD','WBTC','AVAX','FTM','ARB','OP','CRO','LINK','UNI'];
+
+    function buildIndex(data) {
+        // {TICKER: [{code, network, networkLabel, isNative}, …]}
+        var byTicker = {};
+        // {code: {ticker, network, networkLabel}}
+        var byCode = {};
+        (data.networks || []).forEach(function(group) {
+            (group.currencies || []).forEach(function(cur) {
+                var ticker = (cur.ticker || cur.code || '').toUpperCase();
+                var entry = {
+                    code: cur.code,
+                    network: cur.network,
+                    networkLabel: group.label,
+                    isNative: !!cur.is_native,
+                };
+                (byTicker[ticker] = byTicker[ticker] || []).push(entry);
+                byCode[cur.code] = { ticker: ticker, network: cur.network, networkLabel: group.label };
+            });
+        });
+        return { byTicker: byTicker, byCode: byCode };
+    }
+
+    function sortedTickers(byTicker) {
+        var all = Object.keys(byTicker);
+        var top = POPULAR.filter(function(t) { return byTicker[t]; });
+        var rest = all.filter(function(t) { return POPULAR.indexOf(t) < 0; }).sort();
+        return top.concat(rest);
+    }
+
+    function populateTokens(select, tickers, byTicker) {
+        select.innerHTML = '';
+        var seenPopular = false;
+        var popularGroup = document.createElement('optgroup');
+        popularGroup.label = 'Popular';
+        var otherGroup = document.createElement('optgroup');
+        otherGroup.label = 'All tokens';
+        tickers.forEach(function(t) {
+            var opt = document.createElement('option');
+            opt.value = t;
+            var chainCount = byTicker[t].length;
+            opt.textContent = t + (chainCount > 1 ? ' (' + chainCount + ' chains)' : '');
+            if (POPULAR.indexOf(t) >= 0) { popularGroup.appendChild(opt); seenPopular = true; }
+            else { otherGroup.appendChild(opt); }
+        });
+        if (seenPopular) select.appendChild(popularGroup);
+        if (otherGroup.children.length) select.appendChild(otherGroup);
+    }
+
+    function populateChains(select, chains) {
+        select.innerHTML = '';
+        chains.slice().sort(function(a, b) {
+            // Native first, then alpha by label
+            if (a.isNative !== b.isNative) return a.isNative ? -1 : 1;
+            return a.networkLabel.localeCompare(b.networkLabel);
+        }).forEach(function(c) {
+            var opt = document.createElement('option');
+            opt.value = c.code;
+            opt.textContent = c.networkLabel + (c.isNative ? ' (native)' : '');
+            select.appendChild(opt);
+        });
+        select.disabled = chains.length === 0;
+    }
+
+    function syncScope(picker) {
+        var scope = picker.closest('[data-plan-scope]') || document;
+        var chainSel = picker.querySelector('.chain-select');
+        var code = chainSel.value;
+        scope.querySelectorAll('input.pay-currency-input').forEach(function(inp) {
+            inp.value = code;
+        });
+    }
+
+    function wirePicker(picker, index) {
+        var tokenSel = picker.querySelector('.token-select');
+        var chainSel = picker.querySelector('.chain-select');
+        var def = picker.dataset.default || 'usdtmatic';
+        var tickers = sortedTickers(index.byTicker);
+        if (!tickers.length) return;  // keep fallback options
+
+        populateTokens(tokenSel, tickers, index.byTicker);
+
+        // Pick the ticker for the default code if we know it, else first option.
+        var defInfo = index.byCode[def];
+        var initialTicker = defInfo ? defInfo.ticker : tickers[0];
+        tokenSel.value = initialTicker;
+
+        populateChains(chainSel, index.byTicker[initialTicker] || []);
+        if (defInfo && (index.byTicker[initialTicker] || []).some(function(c) { return c.code === def; })) {
+            chainSel.value = def;
+        }
+
+        tokenSel.addEventListener('change', function() {
+            var chains = index.byTicker[tokenSel.value] || [];
+            populateChains(chainSel, chains);
+            syncScope(picker);
+        });
+        chainSel.addEventListener('change', function() { syncScope(picker); });
+        syncScope(picker);
+    }
+
+    fetch('/payments/currencies', { credentials: 'same-origin' })
+        .then(function(r) { return r.ok ? r.json() : { networks: [] }; })
+        .then(function(data) {
+            var index = buildIndex(data);
+            pickers.forEach(function(p) { wirePicker(p, index); });
+        })
+        .catch(function() {
+            // Keep the hardcoded fallback options; still wire scope sync so
+            // the hidden inputs track whatever's selected.
+            pickers.forEach(function(p) {
+                var chainSel = p.querySelector('.chain-select');
+                chainSel.addEventListener('change', function() { syncScope(p); });
+            });
+        });
+})();
+
+// Plan picker (Monthly / Yearly) - works across profile card and modal
+(function() {
+    document.querySelectorAll('.plan-picker').forEach(function(picker) {
+        var tabs = picker.querySelectorAll('.plan-tab');
+        var scope = picker.closest('[data-plan-scope]') || document;
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                tabs.forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                var plan = tab.dataset.plan;
+                // Update all hidden plan inputs within the same scope
+                scope.querySelectorAll('input.plan-input').forEach(function(inp) { inp.value = plan; });
+                // Update price summary in the profile card
+                var summary = tab.dataset.summary;
+                if (summary) {
+                    scope.querySelectorAll('[data-plan-summary]').forEach(function(el) { el.textContent = summary; });
+                }
+                // Update modal price display (amount + period)
+                var amount = tab.dataset.amount;
+                var period = tab.dataset.period;
+                if (amount) {
+                    scope.querySelectorAll('[data-plan-amount]').forEach(function(el) { el.textContent = amount; });
+                }
+                if (period) {
+                    scope.querySelectorAll('[data-plan-period]').forEach(function(el) { el.textContent = period; });
+                }
+            });
+        });
+    });
+})();
+
+(function() {
+    var overlay = document.getElementById('sub-modal-overlay');
+    if (!overlay) return;  // user is subscribed - modal not rendered
+
+    var DISMISS_KEY = 'ratsignal_sub_modal_dismissed_v1';
+    var dismissed = false;
+    try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
+
+    function showModal() {
+        overlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+    }
+    function hideModal() {
+        overlay.classList.remove('visible');
+        document.body.style.overflow = '';
+        try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+    }
+
+    if (!dismissed) {
+        // Small delay so the page has painted first
+        setTimeout(showModal, 350);
+    }
+
+    var closeBtn = document.getElementById('sub-modal-close');
+    var laterBtn = document.getElementById('sub-modal-later');
+    if (closeBtn) closeBtn.addEventListener('click', hideModal);
+    if (laterBtn) laterBtn.addEventListener('click', hideModal);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) hideModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.classList.contains('visible')) hideModal();
+    });
+})();
+</script>
+
+<script>
+// Subscription countdown ticker
+(function() {
+    var panel = document.querySelector('.sub-countdown[data-sub-end]');
+    if (!panel) return;
+    var target = panel.querySelector('[data-sub-countdown]');
+    if (!target) return;
+    var endStr = panel.getAttribute('data-sub-end');
+    if (!endStr) return;
+    if (endStr.indexOf('Z') === -1 && endStr.indexOf('+') === -1) {
+        endStr = endStr.replace(' ', 'T') + 'Z';
+    }
+    var endTime = new Date(endStr).getTime();
+    if (isNaN(endTime)) return;
+
+    function tick() {
+        var diff = endTime - Date.now();
+        if (diff <= 0) {
+            target.textContent = 'Expired';
+            panel.style.borderColor = 'rgba(255,71,87,0.35)';
+            panel.style.background = 'rgba(255,71,87,0.08)';
+            target.style.color = '#ff4757';
+            return;
+        }
+        var days = Math.floor(diff / 86400000);
+        var hours = Math.floor((diff % 86400000) / 3600000);
+        var mins = Math.floor((diff % 3600000) / 60000);
+        var parts = [];
+        if (days > 0) parts.push(days + 'd');
+        parts.push(hours + 'h');
+        parts.push(mins + 'm');
+        target.textContent = parts.join(' ') + ' left';
+        setTimeout(tick, 30000);
+    }
+    tick();
+})();
+</script>
+</div>

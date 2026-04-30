@@ -845,33 +845,10 @@ def _needs_profile_completion(user: dict) -> bool:
 @auth_bp.route("/profile")
 @login_required
 def profile():
-    try:
-        models.expire_if_needed(current_user.id)
-    except Exception as e:
-        print(f"[RatSignal] expire_if_needed failed: {e}", flush=True)
-    user = models.get_user_profile(current_user.id) or {}
-    payments = models.get_user_payments(current_user.id)
-    # For the Telegram Login Widget on the profile page:
-    telegram_linked = bool(user.get("telegram_id"))
-
-    refund_eligible = False
-    refund_hours_left = None
-    try:
-        from temporary.ratsignal.payments import refund_window_for_user
-        refund_eligible, _deadline, refund_hours_left = refund_window_for_user(current_user.id)
-    except Exception as e:
-        print(f"[RatSignal] refund_window_for_user failed: {e}", flush=True)
-
-    return render_template(
-        "profile.html",
-        user=user,
-        payments=payments,
-        telegram_bot_username=TELEGRAM_BOT_USERNAME,
-        telegram_linked=telegram_linked,
-        refund_eligible=refund_eligible,
-        refund_hours_left=refund_hours_left,
-        needs_profile_completion=_needs_profile_completion(user),
-    )
+    # Profile is now an AJAX-loaded section on the homepage. Keep this
+    # route as a redirect for any bookmarks / external links so users
+    # always land on the homepage with the full nav.
+    return redirect("/#profile-section")
 
 
 @auth_bp.route("/complete-profile", methods=["POST"])
@@ -1911,6 +1888,27 @@ def auto_trade():
     # bookmarks / external links still land in the right place.
     return redirect("/#auto-trade-section")
 
+
+
+@auth_bp.route("/profile-fragment", methods=["GET"])
+@login_required
+def profile_fragment():
+    """Return only the inline profile section HTML.
+
+    Used by the homepage's #profile-section to AJAX-load the profile view
+    inline instead of navigating users to a separate page.
+    """
+    from flask import render_template
+    user = models.get_user_profile(current_user.id) or {}
+    needs_profile_completion = bool(
+        not user.get("first_name") or not user.get("last_name")
+        or not user.get("email") or "@ratsignal.local" in (user.get("email") or "")
+    )
+    return render_template(
+        "partials/profile_inline.html",
+        user=user,
+        needs_profile_completion=needs_profile_completion,
+    )
 
 
 @auth_bp.route("/auto-trade-fragment", methods=["GET"])

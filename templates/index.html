@@ -1523,7 +1523,7 @@
             <a href="#pricing">Pricing</a>
             <a href="#downloads" id="nav-downloads-link" style="display:none;">Downloads</a>
             <a href="#auto-trade-section" id="nav-autotrade-link" style="display:none;">Auto-trading</a>
-            <a href="/auth/profile" id="nav-profile-link" style="display:none;">Profile</a>
+            <a href="#profile-section" id="nav-profile-link" style="display:none;">Profile</a>
             <a href="/auth/logout" id="nav-logout-link" class="nav-logout" style="display:none;">Logout</a>
             <a href="/auth/login" id="nav-signin-link" class="nav-signin">Sign in</a>
             <a href="/auth/register" id="nav-getstarted-link" class="nav-cta">Get started</a>
@@ -2094,6 +2094,17 @@
         </div>
     </section>
 
+    <!-- AJAX-loaded Profile section. Filled in for any logged-in user. -->
+    <section class="downloads-section" id="profile-section" style="display:none;">
+        <div class="section-header animate-on-scroll">
+            <div class="section-tag">// Profile</div>
+            <h2 class="section-title">Your <span style="color:#ff6b2b">account</span></h2>
+        </div>
+        <div id="profile-section-body">
+            <p style="color:#8888a0;text-align:center;padding:40px 0;">Loading…</p>
+        </div>
+    </section>
+
     <!-- ======== FOOTER ======== -->
     <footer>
         <div class="footer-logo"><img src="/static/rat_logo.png" alt="🐀" style="height:1.2em;vertical-align:middle;display:inline-block;"> Rat<span class="signal">Signal</span></div>
@@ -2303,6 +2314,7 @@
                 if (getstarted) getstarted.style.display = 'none';
                 if (profile) profile.style.display = '';
                 if (logout) logout.style.display = '';
+                loadProfileFragment();
                 if (data.subscription_active) {
                     if (dl) dl.style.display = '';
                     if (autotrade) autotrade.style.display = '';
@@ -2379,6 +2391,41 @@ window.atSaveEmail = async function(ev) {
     return false;
 };
 </script><script>window.postAction = window.atPostAction;</script>
+
+<script>
+// Re-execute scripts inside an injected fragment (innerHTML doesn't run them).
+function _atRunInjectedScripts(container) {
+    container.querySelectorAll('script').forEach(function(oldScript) {
+        var s = document.createElement('script');
+        for (var i = 0; i < oldScript.attributes.length; i++) {
+            var a = oldScript.attributes[i];
+            s.setAttribute(a.name, a.value);
+        }
+        s.textContent = oldScript.textContent;
+        oldScript.parentNode.replaceChild(s, oldScript);
+    });
+}
+
+function loadProfileFragment() {
+    var section = document.getElementById('profile-section');
+    var body = document.getElementById('profile-section-body');
+    if (!section || !body) return;
+    if (section.dataset.loaded === '1') {
+        section.style.display = '';
+        return;
+    }
+    fetch('/auth/profile-fragment', { credentials: 'same-origin', cache: 'no-store' })
+        .then(function(r) { return r.ok ? r.text() : null; })
+        .then(function(html) {
+            if (!html) return;
+            body.innerHTML = html;
+            section.style.display = '';
+            section.dataset.loaded = '1';
+            _atRunInjectedScripts(body);
+        })
+        .catch(function() {});
+}
+</script>
 </body>
 
 <!-- ======== FAQ SIDE TAB ======== -->
