@@ -2323,6 +2323,10 @@
                     // Reveal Auto-Trading section + AJAX-load its body.
                     loadAutoTradeFragment();
                 }
+                // After the nav reveals, if the URL hash points at one of
+                // the sections we just unhid, scroll to it (otherwise the
+                // anchor click that brought the user here is a no-op).
+                _atScrollToHashIfReady();
             }
         })
         .catch(function() {});
@@ -2425,6 +2429,39 @@ function loadProfileFragment() {
         })
         .catch(function() {});
 }
+</script>
+
+<script>
+// When a nav link to a JS-revealed section is clicked, the section may
+// still be display:none for a moment. We listen, force the section
+// visible if a fragment-loader is wired, and then scroll once it is.
+(function() {
+    var navIds = ['auto-trade-section', 'profile-section', 'downloads'];
+    document.addEventListener('click', function(ev) {
+        var a = ev.target.closest && ev.target.closest('a');
+        if (!a) return;
+        var href = a.getAttribute('href') || '';
+        if (href.charAt(0) !== '#') return;
+        var id = href.slice(1);
+        if (navIds.indexOf(id) < 0) return;
+        var sec = document.getElementById(id);
+        if (!sec) return;
+        if (sec.style.display === 'none') {
+            // Force-show; the AJAX loader (if any) will fill the body when
+            // /auth/status comes back.
+            sec.style.display = '';
+        }
+        if (typeof loadAutoTradeFragment === 'function' && id === 'auto-trade-section')
+            loadAutoTradeFragment();
+        if (typeof loadProfileFragment === 'function' && id === 'profile-section')
+            loadProfileFragment();
+        // Scroll on next tick so the layout settles after display change.
+        setTimeout(function() {
+            try { sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            catch (e) { sec.scrollIntoView(); }
+        }, 30);
+    });
+})();
 </script>
 </body>
 
