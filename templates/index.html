@@ -1522,7 +1522,7 @@
             <a href="#how">How it works</a>
             <a href="#pricing">Pricing</a>
             <a href="#downloads" id="nav-downloads-link" style="display:none;">Downloads</a>
-            <a href="/auth/auto-trade" id="nav-autotrade-link" style="display:none;color:#ff6b2b;font-weight:600;">Auto-Trading</a>
+            <a href="#auto-trade-section" id="nav-autotrade-link" style="display:none;color:#ff6b2b;font-weight:600;">Auto-Trading</a>
             <a href="/auth/profile" id="nav-profile-link" style="display:none;">Profile</a>
             <a href="/auth/logout" id="nav-logout-link" class="nav-logout" style="display:none;">Logout</a>
             <a href="/auth/login" id="nav-signin-link" class="nav-signin">Sign in</a>
@@ -2083,6 +2083,17 @@
         </div>
     </section>
 
+    <!-- AJAX-loaded Auto-Trading section (only filled in for active subscribers). -->
+    <section class="downloads-section" id="auto-trade-section" style="display:none;">
+        <div class="section-header animate-on-scroll">
+            <div class="section-tag">// Auto-Trading</div>
+            <h2 class="section-title">Hands-free <span style="color:#ff6b2b">copy trading</span></h2>
+        </div>
+        <div id="auto-trade-section-body">
+            <p style="color:#8888a0;text-align:center;padding:40px 0;">Loading…</p>
+        </div>
+    </section>
+
     <!-- ======== FOOTER ======== -->
     <footer>
         <div class="footer-logo"><img src="/static/rat_logo.png" alt="🐀" style="height:1.2em;vertical-align:middle;display:inline-block;"> Rat<span class="signal">Signal</span></div>
@@ -2297,12 +2308,77 @@
                     if (autotrade) autotrade.style.display = '';
                     var dlSection = document.getElementById('downloads');
                     if (dlSection) dlSection.style.display = '';
+                    // Reveal Auto-Trading section + AJAX-load its body.
+                    loadAutoTradeFragment();
                 }
             }
         })
         .catch(function() {});
 })();
 </script>
+
+<script>
+// Helpers for the inline Auto-Trading section (loaded via AJAX into
+// #auto-trade-section-body when the user has an active subscription).
+function loadAutoTradeFragment() {
+    var section = document.getElementById('auto-trade-section');
+    var body = document.getElementById('auto-trade-section-body');
+    if (!section || !body) return;
+    if (section.dataset.loaded === '1') {
+        section.style.display = '';
+        return;
+    }
+    fetch('/auth/auto-trade-fragment', { credentials: 'same-origin', cache: 'no-store' })
+        .then(function(r) { return r.ok ? r.text() : null; })
+        .then(function(html) {
+            if (!html) return;
+            body.innerHTML = html;
+            section.style.display = '';
+            section.dataset.loaded = '1';
+        })
+        .catch(function() {});
+}
+
+window.atPostAction = async function(bot, action) {
+    try {
+        const res = await fetch('/api/hosted/' + bot + '/' + action, { method: 'POST' });
+        const data = await res.json().catch(function() { return {}; });
+        if (res.ok) {
+            // Reload only the fragment, not the whole page.
+            var sec = document.getElementById('auto-trade-section');
+            if (sec) sec.dataset.loaded = '';
+            loadAutoTradeFragment();
+        } else {
+            alert('Failed: ' + (data.error || res.statusText));
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+};
+
+window.atSaveEmail = async function(ev) {
+    ev.preventDefault();
+    var form = ev.target;
+    var status = document.getElementById('at-email-fix-status');
+    if (status) { status.className = 'at-email-fix-status'; status.textContent = 'Saving...'; }
+    var body = new FormData(form);
+    try {
+        var res = await fetch('/auth/email', { method: 'POST', body: body, credentials: 'same-origin' });
+        var data = await res.json().catch(function() { return {}; });
+        if (res.ok && data.ok) {
+            if (status) { status.classList.add('success'); status.textContent = 'Email updated. Reloading…'; }
+            var sec = document.getElementById('auto-trade-section');
+            if (sec) sec.dataset.loaded = '';
+            setTimeout(loadAutoTradeFragment, 600);
+        } else {
+            if (status) { status.classList.add('error'); status.textContent = data.error || ('Failed (HTTP ' + res.status + ')'); }
+        }
+    } catch (e) {
+        if (status) { status.classList.add('error'); status.textContent = 'Network error: ' + e.message; }
+    }
+    return false;
+};
+</script><script>window.postAction = window.atPostAction;</script>
 </body>
 
 <!-- ======== FAQ SIDE TAB ======== -->

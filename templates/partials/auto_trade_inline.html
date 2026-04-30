@@ -1,0 +1,204 @@
+{# Auto-Trading section that lives inline on the homepage. Loaded via AJAX. #}
+{# Same content as templates/auto_trade.html, but with no <nav>, scoped CSS, #}
+{# and section/heading in homepage style. #}
+<style>
+#auto-trade-inline {
+    --at-bg-card: #0f1f35;
+    --at-bg-card-hover: #162a45;
+    --at-orange: #ff6b2b;
+    --at-orange-glow: rgba(255, 107, 43, 0.3);
+    --at-green: #00e676;
+    --at-red: #ff4757;
+    --at-cyan: #06B6D4;
+    --at-yellow: #f0b429;
+    --at-text: #f0f0f5;
+    --at-text-secondary: #8888a0;
+    --at-text-muted: #55556a;
+    --at-border: #1a2d4a;
+    --at-gradient: linear-gradient(135deg, #ff6b2b, #ff8f5e);
+    color: var(--at-text);
+}
+#auto-trade-inline a { color: var(--at-cyan); text-decoration: none; transition: color .2s; }
+#auto-trade-inline a:hover { color: var(--at-orange); }
+#auto-trade-inline .at-cta-box {
+    background: var(--at-bg-card); border: 1px solid var(--at-border);
+    border-radius: 16px; padding: 28px; margin: 24px 0;
+    position: relative; overflow: hidden;
+}
+#auto-trade-inline .at-cta-box::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--at-gradient);
+}
+#auto-trade-inline .at-cta-box h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 700;
+    margin-bottom: 12px; position: relative;
+}
+#auto-trade-inline .at-cta-box p { color: var(--at-text-secondary); margin-bottom: 14px; position: relative; }
+#auto-trade-inline .at-cta-box p strong { color: var(--at-text); }
+#auto-trade-inline .at-cta-actions { margin-top: 20px; position: relative; display: flex; gap: 12px; flex-wrap: wrap; }
+#auto-trade-inline .at-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 8px;
+    font-weight: 600; font-size: 14px;
+    border: 1px solid var(--at-border); cursor: pointer;
+    transition: all .2s; text-decoration: none;
+}
+#auto-trade-inline .at-btn-primary { background: var(--at-gradient); color: white !important; }
+#auto-trade-inline .at-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--at-orange-glow); }
+#auto-trade-inline .at-btn-secondary { background: var(--at-bg-card); color: var(--at-text) !important; }
+#auto-trade-inline .at-btn-secondary:hover { background: var(--at-bg-card-hover); border-color: var(--at-cyan); }
+#auto-trade-inline .at-btn-warning { background: rgba(240, 180, 41, 0.15); color: var(--at-yellow) !important; border-color: rgba(240, 180, 41, 0.4); }
+#auto-trade-inline .at-btn-warning:hover { background: rgba(240, 180, 41, 0.25); }
+#auto-trade-inline .at-lighter-banner {
+    background: var(--at-bg-card); border: 1px solid var(--at-border);
+    border-radius: 12px; padding: 16px 20px;
+    margin: 24px 0; display: flex; gap: 14px; align-items: flex-start;
+}
+#auto-trade-inline .at-lighter-banner .icon { font-size: 22px; line-height: 1; padding-top: 2px; }
+#auto-trade-inline .at-lighter-banner-text { color: var(--at-text-secondary); font-size: 14px; }
+#auto-trade-inline .at-lighter-banner-text strong { color: var(--at-text); }
+#auto-trade-inline .at-email-fix-box {
+    background: rgba(240, 180, 41, 0.08); border: 1px dashed rgba(240, 180, 41, 0.4);
+    border-radius: 12px; padding: 18px 20px; margin: 24px 0;
+}
+#auto-trade-inline .at-email-fix-box h3 {
+    font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--at-yellow);
+    margin-bottom: 8px;
+}
+#auto-trade-inline .at-email-fix-box p { color: var(--at-text-secondary); font-size: 14px; margin-bottom: 12px; }
+#auto-trade-inline .at-email-fix-box p code {
+    background: rgba(240, 180, 41, 0.1); padding: 2px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; color: var(--at-yellow); font-size: 13px;
+}
+#auto-trade-inline .at-email-fix-form { display: flex; gap: 8px; flex-wrap: wrap; }
+#auto-trade-inline .at-email-fix-form input {
+    flex: 1; min-width: 220px;
+    background: rgba(10,22,40,0.7); border: 1px solid var(--at-border);
+    border-radius: 8px; color: var(--at-text); padding: 10px 14px;
+    font-family: 'Inter', sans-serif; font-size: 14px;
+}
+#auto-trade-inline .at-email-fix-status { margin-top: 10px; font-size: 13px; min-height: 16px; }
+#auto-trade-inline .at-email-fix-status.success { color: var(--at-green); }
+#auto-trade-inline .at-email-fix-status.error { color: var(--at-red); }
+
+#auto-trade-inline .bot-grid { display: grid; gap: 18px; margin: 26px 0; grid-template-columns: 1fr; }
+@media (min-width: 760px) { #auto-trade-inline .bot-grid { grid-template-columns: 1fr 1fr; } }
+#auto-trade-inline .bot-card {
+    background: var(--at-bg-card); border: 1px solid var(--at-border);
+    border-radius: 14px; padding: 22px; transition: border-color .2s;
+}
+#auto-trade-inline .bot-card:hover { border-color: var(--at-cyan); }
+#auto-trade-inline .bot-card h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 22px;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+}
+#auto-trade-inline .bot-card .tagline { color: var(--at-text-secondary); font-size: 14px; margin-bottom: 14px; }
+#auto-trade-inline .bot-card .empty-message { color: var(--at-text-muted); font-style: italic; padding: 14px 0; font-size: 14px; }
+#auto-trade-inline .bot-card .badge {
+    font-size: 11px; padding: 3px 8px; border-radius: 999px;
+    font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+}
+#auto-trade-inline .bot-card .badge-active { background: rgba(0, 230, 118, 0.15); color: var(--at-green); }
+#auto-trade-inline .bot-card .badge-paused { background: rgba(240, 180, 41, 0.15); color: var(--at-yellow); }
+#auto-trade-inline .bot-card .badge-disabled { background: rgba(255, 71, 87, 0.15); color: var(--at-red); }
+#auto-trade-inline .bot-card .badge-none { background: rgba(136, 136, 160, 0.15); color: var(--at-text-secondary); }
+#auto-trade-inline .bot-card.preview { opacity: 0.7; }
+#auto-trade-inline .bot-card .bot-stats {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0;
+}
+#auto-trade-inline .bot-card .bot-stat {
+    background: rgba(10,22,40,0.5); padding: 10px 12px; border-radius: 8px;
+}
+#auto-trade-inline .bot-card .bot-stat .label { font-size: 11px; color: var(--at-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+#auto-trade-inline .bot-card .bot-stat .value { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--at-text); margin-top: 2px; }
+#auto-trade-inline .bot-card .bot-stat .value.positive { color: var(--at-green); }
+#auto-trade-inline .bot-card .bot-stat .value.negative { color: var(--at-red); }
+#auto-trade-inline .bot-card .bot-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+</style>
+
+<div id="auto-trade-inline">
+    <p class="section-subtitle" style="margin-bottom: 8px;">
+        Configure your exchange API key once. We replicate every trade our bots
+        make onto your account, on our infrastructure. No software to install,
+        no PC to keep on.
+    </p>
+
+    {% if not is_logged_in %}
+        <div class="at-cta-box">
+            <h2>Sign in to continue</h2>
+            <p>Auto-Trading is available to active subscribers.
+               Sign in to your RatSignal account, or create one to get started.</p>
+            <div class="at-cta-actions">
+                <a class="at-btn at-btn-primary" href="/auth/login">Sign in</a>
+                <a class="at-btn at-btn-secondary" href="/auth/register">Create account</a>
+            </div>
+        </div>
+    {% elif not sub_active %}
+        {% set _email = user.get('email') or '' %}
+        {% set _is_placeholder_email = _email.endswith('@ratsignal.local') %}
+        {% if user.get('first_name') %}
+            {% set greeting = user.get('first_name') %}
+        {% elif not _is_placeholder_email and _email %}
+            {% set greeting = _email %}
+        {% else %}
+            {% set greeting = 'there' %}
+        {% endif %}
+        <div class="at-cta-box">
+            <h2>Subscription required</h2>
+            <p>Hi <strong>{{ greeting }}</strong> -
+               Auto-Trading is included with any active subscription. Subscribe to
+               start letting our infrastructure copy trades onto your exchange
+               account automatically.</p>
+            <div class="at-cta-actions">
+                <a class="at-btn at-btn-primary" href="/#pricing">View pricing &amp; subscribe</a>
+                <a class="at-btn at-btn-secondary" href="/auth/profile">My profile</a>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if is_logged_in and (user.get('email') or '').endswith('@ratsignal.local') %}
+        <div class="at-email-fix-box">
+            <h3>This isn't your email - change it</h3>
+            <p>We auto-generated <code>{{ user.get('email') }}</code> for your
+               Telegram registration. Set your real address to receive Stripe
+               receipts, expiry warnings, and as a backup login method.</p>
+            <form class="at-email-fix-form" onsubmit="return atSaveEmail(event)">
+                <input type="email" name="email" placeholder="you@example.com"
+                       autocomplete="email" required>
+                <button type="submit" class="at-btn at-btn-warning">Save email</button>
+            </form>
+            <p id="at-email-fix-status" class="at-email-fix-status"></p>
+        </div>
+    {% endif %}
+
+    <div class="at-lighter-banner">
+        <div class="icon">⚡</div>
+        <div class="at-lighter-banner-text">
+            <strong>We trade on Lighter ourselves.</strong>
+            Lighter is the recommended exchange for the closest 1:1 copy of our trades
+            (same markets, same fees). Binance Futures works too, but some smaller
+            markets may be unavailable on your account.
+        </div>
+    </div>
+
+    {% if is_logged_in and sub_active %}
+        <div class="bot-grid">
+            {% for bot in bots %}
+                {% include 'partials/hosted_bot_card.html' %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bot-grid">
+            <div class="bot-card preview">
+                <h2>Slipstream <span class="badge badge-none">Preview</span></h2>
+                <p class="tagline">Copy-trade of 10 elite Hyperliquid wallets, executed on Lighter.</p>
+                <p class="empty-message">Configure your API key and click Activate to start.</p>
+            </div>
+            <div class="bot-card preview">
+                <h2>Quick Bite <span class="badge badge-none">Preview</span></h2>
+                <p class="tagline">ML SHORT-only strategy. XGBoost, 6.6M training samples.</p>
+                <p class="empty-message">Configure your API key and click Activate to start.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>

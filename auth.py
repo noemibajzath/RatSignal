@@ -1942,6 +1942,50 @@ def auto_trade():
     )
 
 
+
+@auth_bp.route("/auto-trade-fragment", methods=["GET"])
+def auto_trade_fragment():
+    """Return only the inline auto-trade section HTML (no full page wrap).
+
+    Used by the homepage's #auto-trade-section to AJAX-load this view inline
+    instead of navigating to a separate page.
+    """
+    from flask import render_template
+    from temporary.ratsignal import models, hosted
+
+    is_logged_in = HAS_FLASK_LOGIN and current_user.is_authenticated
+    user_id = current_user.id if is_logged_in else None
+    user = models.get_user_by_id(user_id) if user_id else None
+    sub_active = hosted.is_subscription_active_for_hosted(user) if user else False
+
+    bot_data = []
+    if is_logged_in:
+        for bot in _HOSTED_BOTS_AUTH:
+            cfg = models.get_hosted_bot_config(user_id, bot) or {}
+            if cfg.get("api_key_encrypted"):
+                stats = models.hosted_stats(user_id, bot, days=30)
+                recent = models.list_hosted_trades(user_id, bot=bot, limit=5)
+            else:
+                stats = {"trades": 0, "win_rate": 0, "total_pnl": 0, "open_positions": 0}
+                recent = []
+            bot_data.append({
+                "bot": bot,
+                "display_name": "Slipstream" if bot == "slipstream" else "Quick Bite",
+                "config": cfg,
+                "stats": stats,
+                "recent_trades": recent,
+                "configured": bool(cfg.get("api_key_encrypted")),
+                "enabled": bool(cfg.get("enabled")),
+                "paused": bool(cfg.get("paused")),
+            })
+
+    return render_template(
+        "partials/auto_trade_inline.html",
+        user=user, is_logged_in=is_logged_in,
+        sub_active=sub_active, bots=bot_data,
+    )
+
+
 @auth_bp.route("/auto-trade/<bot>/setup", methods=["GET"])
 def auto_trade_setup(bot):
     from flask import render_template, redirect, url_for, abort
