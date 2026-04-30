@@ -1033,7 +1033,7 @@ def payment_status(payment_id):
 
 
 # ---------------------------------------------------------------------------
-# 7-day refund / cancel
+# 30-day money-back guarantee / cancel
 # ---------------------------------------------------------------------------
 REFUND_WINDOW_DAYS = 30
 
