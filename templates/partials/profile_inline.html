@@ -728,12 +728,18 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Telegram</span>
-                        <span class="info-value highlight">{{ ('@' + user.get('telegram', '').lstrip('@')) if user.get('telegram') else 'Not set' }}</span>
+                        <span class="info-value highlight">{% set _tg = user.get('telegram') or user.get('telegram_username') %}{{ ('@' + _tg.lstrip('@')) if _tg else 'Not set' }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Discord</span>
-                        <span class="info-value highlight">{{ user.get('discord', '') or 'Not set' }}</span>
+                        <span class="info-value highlight">{% if user.get('discord') %}{{ user.get('discord') }}{% elif user.get('discord_id') %}<span style="color:#06B6D4">Linked via Discord</span>{% else %}Not set{% endif %}</span>
                     </div>
+                    {% if user.get('google_id') %}
+                    <div class="info-item">
+                        <span class="info-label">Google</span>
+                        <span class="info-value highlight"><span style="color:#06B6D4">Linked via Google</span></span>
+                    </div>
+                    {% endif %}
                     <div class="info-item">
                         <span class="info-label">Wallet Address</span>
                         <span class="info-value mono">{{ user.get('wallet_address', '') or 'Not provided' }}</span>
