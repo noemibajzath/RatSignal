@@ -1035,7 +1035,7 @@ def payment_status(payment_id):
 # ---------------------------------------------------------------------------
 # 7-day refund / cancel
 # ---------------------------------------------------------------------------
-REFUND_WINDOW_DAYS = 7
+REFUND_WINDOW_DAYS = 30
 
 
 def _latest_completed_payment(user_id: int) -> dict | None:

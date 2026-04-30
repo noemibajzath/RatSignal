@@ -862,7 +862,7 @@
     <div class="refund-modal">
         <button type="button" class="refund-modal-close" id="refund-modal-close" aria-label="Close">&times;</button>
         <h2 class="refund-modal-title">Cancel &amp; request refund</h2>
-        <p class="refund-modal-desc">You're within the 7-day refund window. Submitting this form will end your subscription access immediately. We'll return the full amount to the wallet below within 24 hours.</p>
+        <p class="refund-modal-desc">You're within the 30-day money-back guarantee window. Submitting this form will end your subscription access immediately. We'll return the full amount to the wallet below within 24 hours.</p>
         <form id="refund-form" action="/payments/cancel-refund" method="POST">
             <label class="refund-label" for="refund-wallet-input">Refund wallet address</label>
             <input type="text" id="refund-wallet-input" name="refund_wallet" class="refund-input" placeholder="0x... (USDT on Polygon)" required minlength="10" autocomplete="off">
@@ -1231,12 +1231,12 @@ body.pc-locked { overflow: hidden; }
         <div class="sub-modal-badges">
             <span class="sub-badge sub-badge-green sub-badge-lg">7-day free trial</span>
         </div>
-        <p class="sub-modal-desc">Pay once, try it for 7 days. Not for you? Cancel in the first week and we refund the full amount to your wallet within 24 hours.</p>
+        <p class="sub-modal-desc">7-day free trial included. After that, you have a 30-day money-back guarantee — if results are negative within 30 days we refund the full amount to your wallet within 24 hours.</p>
         <ul class="sub-modal-features">
             <li><span>✓</span> Live signals from ATLAS, Arbitrage &amp; Smart Money bots</li>
             <li><span>✓</span> Real-time PnL dashboard (8 subaccounts on Lighter)</li>
             <li><span>✓</span> Premium Telegram alerts within 24h</li>
-            <li><span>✓</span> Full refund to your wallet if you cancel in 7 days</li>
+            <li><span>✓</span> 30-day money-back guarantee — full refund to your wallet</li>
         </ul>
         <div class="sub-modal-price" data-plan-price><span data-plan-amount>$100</span><span data-plan-period>/month</span></div>
 
