@@ -1581,6 +1581,11 @@ def discord_callback():
     # If already logged in, link Discord to current account
     if HAS_FLASK_LOGIN and current_user.is_authenticated:
         models.link_discord(current_user.id, discord_id)
+        _backfill_social_fields(
+            current_user.id,
+            discord=discord_user.get('username', ''),
+            first_name=discord_name or '',
+        )
         flash("Discord account linked!", "success")
         return redirect("/auth/profile")
 
@@ -1592,6 +1597,11 @@ def discord_callback():
         user_dict = models.get_user_by_email(discord_email)
         if user_dict:
             models.link_discord(user_dict['id'], discord_id)
+            _backfill_social_fields(
+                user_dict['id'],
+                discord=discord_user.get('username', ''),
+                first_name=discord_name or '',
+            )
 
     if not user_dict:
         # 3. Create new account
@@ -1705,6 +1715,11 @@ def google_callback():
     # If already logged in, link Google to current account
     if HAS_FLASK_LOGIN and current_user.is_authenticated:
         models.link_google(current_user.id, google_id)
+        _backfill_social_fields(
+            current_user.id,
+            first_name=google_given or google_name or '',
+            last_name=google_family or '',
+        )
         flash("Google account linked!", "success")
         return redirect("/auth/profile")
 
@@ -1716,6 +1731,11 @@ def google_callback():
         user_dict = models.get_user_by_email(google_email)
         if user_dict:
             models.link_google(user_dict['id'], google_id)
+            _backfill_social_fields(
+                user_dict['id'],
+                first_name=google_given or google_name or '',
+                last_name=google_family or '',
+            )
 
     # 3. Create new account
     if not user_dict:
@@ -2033,4 +2053,23 @@ def force_real_email():
     # Anything else: bounce to the homepage. The profile fragment will
     # AJAX-load there and block the page with the Complete Profile modal.
     return redirect("/")
+
+
+def _backfill_social_fields(user_id: int, **fields):
+    """Update profile fields on `user_id` only for keys whose current value
+    is empty/None. Used after linking a secondary social account so we
+    surface its username/name without overwriting the primary one."""
+    try:
+        user = models.get_user_profile(user_id) or {}
+        to_set = {}
+        for key, value in fields.items():
+            if not value:
+                continue
+            current = (user.get(key) or "").strip()
+            if not current:
+                to_set[key] = value
+        if to_set:
+            models.update_user_profile(user_id, to_set)
+    except Exception as e:
+        print(f"[RatSignal] _backfill_social_fields error user={user_id}: {e}", flush=True)
 
