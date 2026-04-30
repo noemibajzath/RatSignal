@@ -227,6 +227,20 @@ def set_user_email_with_merge(user_id: int, new_email: str) -> tuple[bool, str |
     new_email = (new_email or "").strip().lower()
     if not new_email:
         return (False, "Email is required.")
+    # If the user already has a real (non-placeholder) email, refuse to
+    # change it — they have to contact support. Email changes are otherwise
+    # only allowed for the initial placeholder-to-real transition.
+    with _get_conn() as conn:
+        row = conn.execute("SELECT email FROM users WHERE id=?", (user_id,)).fetchone()
+        if row:
+            current_email = (row["email"] or "").strip().lower()
+            is_placeholder = current_email.endswith("@ratsignal.local")
+            if current_email and not is_placeholder and new_email != current_email:
+                return (
+                    False,
+                    "Email cannot be changed from your profile. "
+                    "Please contact support at ratsignalcrypto@gmail.com to change your email.",
+                )
     fields = (
         "id", "telegram_id", "telegram_username", "google_id", "discord_id",
         "subscription_status", "subscription_plan", "subscription_end",
