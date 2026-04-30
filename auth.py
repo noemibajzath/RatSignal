@@ -971,29 +971,47 @@ def complete_profile():
 
     current_email = (user.get("email") or "").strip().lower()
 
-    if new_email.lower() != current_email:
-        ok, err = models.set_user_email_with_merge(current_user.id, new_email)
-        if not ok:
-            return _err(
-                err or "This email is already in use by another account. "
-                "Please use a different email or contact support.",
-                status=409,
-            )
-
+    # Save the names immediately so the user does not have to retype them
+    # on retry of the verification step.
     try:
         models.update_user_profile(current_user.id, {
             "first_name": first_name,
             "last_name": last_name,
             "display_name": f"{first_name} {last_name}".strip(),
         })
-        fresh = models.get_user_profile(current_user.id) or {}
-        print(f"[RatSignal] complete-profile saved user={current_user.id} "
-              f"-> email={fresh.get('email')!r} first={fresh.get('first_name')!r} "
-              f"last={fresh.get('last_name')!r}", flush=True)
     except Exception as e:
-        print(f"[RatSignal] complete-profile error: {e}", flush=True)
+        print(f"[RatSignal] complete-profile name save error: {e}", flush=True)
         return _err("Could not save your profile. Please try again.", status=500)
 
+    if new_email.lower() != current_email:
+        # Send verification email; only update email after the user clicks
+        # the link via /auth/verify-email-change.
+        try:
+            token = models.create_email_change_token(current_user.id, new_email)
+            verify_url = (
+                request.host_url.rstrip("/")
+                + url_for("auth.verify_email_change")
+                + f"?token={token}"
+            )
+            _send_email_change_verify_email(new_email, first_name, verify_url)
+        except Exception as e:
+            print(f"[RatSignal] complete-profile token/email error: {e}", flush=True)
+            return _err("Could not send the verification email. Please try again.", status=500)
+        print(f"[RatSignal] complete-profile pending-email user={current_user.id} new_email={new_email!r}", flush=True)
+        return jsonify({
+            "ok": True,
+            "email_pending": True,
+            "email": new_email,
+            "message": (
+                f"Check your inbox at {new_email} for a verification link. "
+                "Once you click it, your account is fully active."
+            ),
+        })
+
+    fresh = models.get_user_profile(current_user.id) or {}
+    print(f"[RatSignal] complete-profile saved user={current_user.id} "
+          f"-> email={fresh.get('email')!r} first={fresh.get('first_name')!r} "
+          f"last={fresh.get('last_name')!r}", flush=True)
     flash("Profile saved. Welcome aboard!", "success")
     return jsonify({"ok": True, "redirect": "/auth/profile"})
 
