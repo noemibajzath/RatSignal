@@ -1193,6 +1193,27 @@ body.pc-locked { overflow: hidden; }
             console.log('[RatSignal] Response:', resp.status);
             return resp.json().then(function(data) { return { status: resp.status, data: data }; });
         }).then(function(r) {
+            if (r.data && r.data.email_pending) {
+                // Replace the modal contents with a check-email message.
+                var modal = document.querySelector('.profile-complete-modal');
+                if (modal) {
+                    modal.innerHTML = (
+                        '<div class="profile-complete-ribbon"></div>' +
+                        '<h2>Check your email</h2>' +
+                        '<p class="profile-complete-desc">' +
+                        'We just sent a verification link to <strong>' +
+                        (r.data.email || '') + '</strong>. Click it to confirm ' +
+                        'and unlock your account. You can close this tab and ' +
+                        'open the email — your name has already been saved.' +
+                        '</p>' +
+                        '<p style="font-size:0.85rem;color:#8888a0;margin-top:16px;line-height:1.6;">' +
+                        'Did not get it within a minute or two? Check the spam folder, ' +
+                        'or refresh this page and try a different address.' +
+                        '</p>'
+                    );
+                }
+                return;
+            }
             if (r.data && r.data.ok) {
                 window.location.href = r.data.redirect || '/auth/profile';
                 return;

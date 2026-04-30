@@ -782,3 +782,52 @@ def hosted_stats(user_id: int, bot: str, days: int = 30) -> dict:
         "total_pnl": closed["total_pnl"],
         "open_positions": open_count,
     }
+
+
+def _ensure_email_change_tokens_table():
+    with _get_conn() as conn:
+        conn.execute("""CREATE TABLE IF NOT EXISTS email_change_tokens (
+            token TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            new_email TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            expires_at TEXT NOT NULL,
+            used INTEGER NOT NULL DEFAULT 0
+        )""")
+
+
+def create_email_change_token(user_id: int, new_email: str) -> str:
+    """Issue a 24h-valid token tying a user to a pending new email address.
+    The new email is only written onto the user once the token is consumed."""
+    import secrets
+    from datetime import datetime, timedelta
+    _ensure_email_change_tokens_table()
+    token = secrets.token_urlsafe(32)
+    expires_at = (datetime.utcnow() + timedelta(hours=24)).isoformat()
+    with _get_conn() as conn:
+        conn.execute(
+            "INSERT INTO email_change_tokens (token, user_id, new_email, expires_at) "
+            "VALUES (?, ?, ?, ?)",
+            (token, user_id, (new_email or "").lower().strip(), expires_at),
+        )
+    return token
+
+
+def consume_email_change_token(token: str) -> dict | None:
+    """Atomically look up + mark as used. Returns {user_id, new_email} when
+    the token is valid, None when missing/expired/already used."""
+    from datetime import datetime
+    _ensure_email_change_tokens_table()
+    with _get_conn() as conn:
+        row = conn.execute(
+            "SELECT user_id, new_email, expires_at, used FROM email_change_tokens "
+            "WHERE token=?",
+            (token,),
+        ).fetchone()
+        if not row or row["used"]:
+            return None
+        if row["expires_at"] < datetime.utcnow().isoformat():
+            return None
+        conn.execute("UPDATE email_change_tokens SET used=1 WHERE token=?", (token,))
+        return {"user_id": row["user_id"], "new_email": row["new_email"]}
+

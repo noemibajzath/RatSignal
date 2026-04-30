@@ -236,6 +236,71 @@ This link expires in 24 hours. If you didn't sign up for RatSignal, you can safe
 # ---------------------------------------------------------------------------
 # Welcome email
 # ---------------------------------------------------------------------------
+def _send_email_change_verify_email(to_email: str, first_name: str, verify_url: str):
+    """Send a 'confirm your new email address' email in a background thread."""
+    def _send():
+        try:
+            sender = "ratsignalcrypto@gmail.com"
+            password = os.environ.get("GMAIL_APP_PASSWORD", "")
+            if not password:
+                print("[RatSignal] GMAIL_APP_PASSWORD not set, skipping email-change verification", flush=True)
+                return
+            display_name = first_name or "there"
+
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = "Confirm your RatSignal email address"
+            msg["From"] = f"RatSignal <{sender}>"
+            msg["To"] = to_email
+
+            html = f"""<!DOCTYPE html>
+<html><head><style>
+body {{ font-family: 'Inter', Arial, sans-serif; background: #0a1628; color: #f0f0f5; margin: 0; padding: 0; }}
+.container {{ max-width: 560px; margin: 0 auto; padding: 40px 24px; }}
+.header {{ text-align: center; margin-bottom: 32px; }}
+.header h1 {{ font-size: 24px; margin: 0; }}
+.header h1 span {{ color: #ff6b2b; }}
+.card {{ background: #0f1f35; border: 1px solid #1a2d4a; border-radius: 12px; padding: 32px; }}
+.card h2 {{ font-size: 20px; margin: 0 0 16px; color: #f0f0f5; }}
+.card h2 .name {{ color: #ff6b2b; }}
+.card p {{ color: #8888a0; line-height: 1.7; margin: 0 0 16px; font-size: 15px; }}
+.btn {{ display: inline-block; background: #ff6b2b; color: #fff !important; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 8px 0 16px; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; font-size: 14px; }}
+.footer {{ text-align: center; margin-top: 32px; color: #55556a; font-size: 12px; }}
+</style></head>
+<body>
+<div class="container">
+  <div class="header"><h1>Rat<span>Signal</span></h1></div>
+  <div class="card">
+    <h2 style="color:#f0f0f5;">Hi <span class="name" style="color:#ff6b2b;">{display_name}</span>,</h2>
+    <p>You're using this address as your RatSignal email. Tap the button below to confirm — until you do, your account stays in pending mode.</p>
+    <p style="text-align:center;margin:24px 0;"><a href="{verify_url}" class="btn">Confirm Email</a></p>
+    <p style="font-size:13px;color:#55556a;">This link expires in 24 hours. If you didn't request this, you can safely ignore the email — no change is made until you click.</p>
+  </div>
+  <div class="footer">&copy; 2026 RatSignal. All rights reserved.</div>
+</div></body></html>"""
+
+            text = f"""Hi {display_name},
+
+You're using this address as your RatSignal email. Tap the link below to confirm — until you do, your account stays in pending mode.
+
+{verify_url}
+
+This link expires in 24 hours. If you didn't request this, you can safely ignore the email — no change is made until you click.
+
+— The RatSignal Team
+"""
+            msg.attach(MIMEText(text, "plain"))
+            msg.attach(MIMEText(html, "html"))
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as server:
+                server.starttls()
+                server.login(sender, password)
+                server.sendmail(sender, to_email, msg.as_string())
+            print(f"[RatSignal] Email-change verification sent to {to_email}", flush=True)
+        except Exception as e:
+            print(f"[RatSignal] Failed to send email-change verification: {e}", flush=True)
+
+    threading.Thread(target=_send, daemon=True).start()
+
+
 def _send_welcome_email(to_email: str, first_name: str):
     """Send welcome email in background thread."""
     def _send():
@@ -521,6 +586,32 @@ def verify_email():
 
     flash("Email verified — your account is ready.", "success")
     return redirect("/auth/profile")
+
+
+
+@auth_bp.route("/verify-email-change", methods=["GET"])
+def verify_email_change():
+    """Click-target for the 'confirm your email' link. Consumes the token
+    and writes the new email onto the user (going through the merge helper
+    so any existing account with that email is folded in)."""
+    token = request.args.get("token", "").strip()
+    if not token:
+        flash("Invalid verification link.", "error")
+        return redirect("/")
+    data = models.consume_email_change_token(token)
+    if not data:
+        flash(
+            "This verification link is invalid or has expired. "
+            "Sign in again and re-enter your email to get a fresh link.",
+            "error",
+        )
+        return redirect("/")
+    ok, err = models.set_user_email_with_merge(data["user_id"], data["new_email"])
+    if not ok:
+        flash(err or "Could not update email. Please contact support.", "error")
+        return redirect("/")
+    flash("Your email has been verified. You're all set!", "success")
+    return redirect("/")
 
 
 @auth_bp.route("/logout")
@@ -1075,13 +1166,26 @@ def update_email_only():
     if new_email == current_email:
         return jsonify({"ok": True, "unchanged": True})
     try:
-        ok, err = models.set_user_email_with_merge(current_user.id, new_email)
+        token = models.create_email_change_token(current_user.id, new_email)
+        verify_url = (
+            request.host_url.rstrip("/")
+            + url_for("auth.verify_email_change")
+            + f"?token={token}"
+        )
+        first = (user.get("first_name") or "").strip() or "there"
+        _send_email_change_verify_email(new_email, first, verify_url)
     except Exception as e:
         print(f"[RatSignal] update_email_only error user={current_user.id}: {e}", flush=True)
-        return jsonify({"ok": False, "error": "Could not save your new email. Please try again."}), 500
-    if not ok:
-        return jsonify({"ok": False, "error": err or "That email is already in use by another account."}), 409
-    return jsonify({"ok": True, "email": new_email})
+        return jsonify({"ok": False, "error": "Could not send the verification email. Please try again."}), 500
+    return jsonify({
+        "ok": True,
+        "email_pending": True,
+        "email": new_email,
+        "message": (
+            f"Check your inbox at {new_email} for a verification link. "
+            "Once you click it, the new email becomes active."
+        ),
+    })
 
 
 def _has_active_copycat_token(user_id: int) -> bool:
