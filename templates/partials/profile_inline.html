@@ -705,7 +705,7 @@
             {% endif %}
 
             <div class="telegram-notice" style="margin-top:20px;">
-                <strong>Telegram Signal Group:</strong> Our team will add you to the Premium Signal Group within 24 hours of registration. You'll receive real-time alerts straight to your Telegram.
+                <strong>Telegram Signal Group:</strong> Our team will add you to the Signal Group within 24 hours of registration. You'll receive real-time alerts straight to your Telegram.
             </div>
         </div>
 
@@ -984,7 +984,7 @@
     <form id="profile-complete-form" class="profile-complete-modal" method="POST" action="/auth/complete-profile" autocomplete="on">
         <div class="profile-complete-ribbon"></div>
         <h2>Complete your profile</h2>
-        <p class="profile-complete-desc">We need a real email and name for your RatSignal account so you can receive payment receipts, subscription reminders, and access the premium signal group.</p>
+        <p class="profile-complete-desc">We need a real email and name for your RatSignal account so you can receive payment receipts, subscription reminders, and access the signal group.</p>
 
         <div class="profile-complete-row">
             <label for="pc-first-name">First name</label>
@@ -1002,9 +1002,6 @@
                    value="{% if user.get('email') and '@ratsignal.local' not in user.get('email') %}{{ user.get('email') }}{% endif %}" required>
             <div class="profile-complete-hint">We'll send payment receipts and renewal reminders here.</div>
         </div>
-
-        <div id="pc-merge-panel" style="display:none;margin:4px 0 14px;padding:12px 14px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.3);border-radius:10px;">
-            <div id="pc-merge-msg" style="font-size:0.85rem;color:#06B6D4;margin-bottom:10px;line-height:1.5;"></div>
             <label for="pc-merge-password" style="display:block;font-size:0.72rem;color:#8888a0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;font-weight:600;">Password for the existing account</label>
             <input type="password" id="pc-merge-password" name="merge_password" placeholder="••••••••"
                    style="width:100%;padding:12px 14px;background:rgba(10,22,40,0.7);border:1px solid #1a2d4a;border-radius:10px;color:#f0f0f5;font-family:'Inter',sans-serif;font-size:0.95rem;outline:none;">
@@ -1169,20 +1166,6 @@ body.pc-locked { overflow: hidden; }
             }
             if (r.data && r.data.ok) {
                 window.location.href = r.data.redirect || '/auth/profile';
-                return;
-            }
-            if (r.data && r.data.merge_required) {
-                // Email belongs to an existing account - reveal the password field
-                // so the user can prove ownership and we can merge the two accounts.
-                var panel = document.getElementById('pc-merge-panel');
-                var msg = document.getElementById('pc-merge-msg');
-                var pw  = document.getElementById('pc-merge-password');
-                if (msg) msg.innerHTML = r.data.message || 'Enter password to link accounts.';
-                if (panel) panel.style.display = 'block';
-                if (pw) { pw.required = true; pw.focus(); }
-                btn.disabled = false;
-                btn.textContent = 'Merge and sign in →';
-                err.style.display = 'none';
                 return;
             }
             showErr((r.data && r.data.error) || ('Server returned ' + r.status));
@@ -1719,3 +1702,6 @@ function toggleEdit(show) {
 })();
 </script>
 </div>
+
+<script>(function(){var ov=document.getElementById('profile-complete-overlay');if(!ov||ov.dataset.pcOverlayLocked==='1')return;ov.dataset.pcOverlayLocked='1';ov.addEventListener('click',function(e){var modal=ov.querySelector('.profile-complete-modal');if(modal && modal.contains(e.target))return;e.preventDefault();e.stopPropagation();});document.addEventListener('keydown',function(e){if(!document.getElementById('profile-complete-overlay'))return;if(e.key==='Escape'){e.preventDefault();e.stopPropagation();}},true);})();</script>
+
