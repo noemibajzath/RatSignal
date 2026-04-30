@@ -1977,3 +1977,60 @@ def auto_trade_setup(bot):
         display_name="Slipstream" if bot == "slipstream" else "Quick Bite",
         config=cfg,
     )
+
+
+# ---------------------------------------------------------------------------
+# Global enforcement: every logged-in user must have a real email. Anyone
+# with a `@ratsignal.local` placeholder (created during a Telegram or other
+# social-auth signup that did not provide an email) is force-redirected to
+# the homepage where the Complete Profile modal will block the page until
+# they enter a real address.
+# ---------------------------------------------------------------------------
+_EMAIL_GATE_ALLOWED_ENDPOINTS = {
+    # Endpoints the user must be able to hit while still in the placeholder
+    # state, otherwise they can't actually fix their email.
+    "auth.complete_profile",
+    "auth.update_email_only",
+    "auth.profile_fragment",   # the modal lives in this fragment
+    "auth.logout",
+    "auth.login_page",
+    "auth.register_page",
+    "auth.email_verify",
+    "auth.email_verify_send",
+    "static",
+    "auth.discord_callback",
+    "auth.google_callback",
+    "auth.telegram_callback",
+    "auth.tg_bot_login_complete",
+}
+
+_EMAIL_GATE_ALLOWED_PATH_PREFIXES = (
+    "/static/",
+    "/auth/",          # any auth endpoint can run (login/logout/social/email)
+    "/favicon",
+)
+
+
+@auth_bp.before_app_request
+def force_real_email():
+    if not (HAS_FLASK_LOGIN and current_user.is_authenticated):
+        return None
+    user = models.get_user_by_id(current_user.id) or {}
+    email = (user.get("email") or "").lower()
+    if not email.endswith("@ratsignal.local"):
+        return None
+
+    ep = request.endpoint or ""
+    if ep in _EMAIL_GATE_ALLOWED_ENDPOINTS:
+        return None
+    path = request.path or ""
+    for prefix in _EMAIL_GATE_ALLOWED_PATH_PREFIXES:
+        if path.startswith(prefix):
+            return None
+    if path == "/":
+        # Homepage is where the modal renders, allow it.
+        return None
+    # Anything else: bounce to the homepage. The profile fragment will
+    # AJAX-load there and block the page with the Complete Profile modal.
+    return redirect("/")
+
