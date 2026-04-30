@@ -264,7 +264,9 @@
     </a>
     <div class="dash-nav-right">
         <a href="/">Trading Dashboard</a>
+        {% if user.get('subscription_status') in ('active', 'trial') %}
         <a href="/auth/auto-trade" style="color:#ff6b2b;font-weight:600;">Auto-Trading</a>
+        {% endif %}
         <a href="/auth/logout" class="btn-logout">Logout</a>
     </div>
 </nav>

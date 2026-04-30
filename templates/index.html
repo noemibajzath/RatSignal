@@ -476,6 +476,15 @@
             background: var(--accent-red);
         }
 
+        .ticker-status.combined {
+            color: var(--accent-orange);
+        }
+
+        .ticker-status.combined .status-dot {
+            background: var(--accent-orange);
+            animation: pulse 2s infinite;
+        }
+
         .ticker-pnl {
             font-family: 'JetBrains Mono', monospace;
             font-size: 1.5rem;
@@ -491,8 +500,10 @@
         }
 
         .ticker-meta {
-            font-size: 0.8rem;
-            color: var(--accent-cyan); opacity: 0.7;
+            font-size: 0.85rem;
+            color: #C6D2E2;
+            font-weight: 500;
+            line-height: 1.35;
             margin-top: 4px;
         }
 
@@ -551,7 +562,7 @@
         }
         .popup-close:hover { color: var(--text-primary); }
         .popup-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
-        .popup-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 20px; }
+        .popup-desc { font-size: 0.92rem; color: #C6D2E2; font-weight: 500; line-height: 1.4; margin-bottom: 20px; }
         .popup-stats {
             display: grid; grid-template-columns: 1fr 1fr 1fr;
             gap: 10px; margin-bottom: 20px;
@@ -1511,7 +1522,7 @@
             <a href="#how">How it works</a>
             <a href="#pricing">Pricing</a>
             <a href="#downloads" id="nav-downloads-link" style="display:none;">Downloads</a>
-            <a href="/auth/auto-trade" id="nav-autotrade-link" style="color:#ff6b2b;font-weight:600;">Auto-Trading</a>
+            <a href="/auth/auto-trade" id="nav-autotrade-link" style="display:none;color:#ff6b2b;font-weight:600;">Auto-Trading</a>
             <a href="/auth/profile" id="nav-profile-link" style="display:none;">Profile</a>
             <a href="/auth/logout" id="nav-logout-link" class="nav-logout" style="display:none;">Logout</a>
             <a href="/auth/login" id="nav-signin-link" class="nav-signin">Sign in</a>
@@ -1780,23 +1791,28 @@
         <div class="section-header animate-on-scroll" style="margin-bottom: 32px;">
             <div class="section-tag">// Live accounts</div>
             <h2 class="section-title">{{ agg.accounts_total }} active bots on Lighter DEX</h2>
-            <p class="section-subtitle">click any card for details</p>
         </div>
         <div class="live-ticker" id="accounts-grid">
             {% for acct in accounts %}
             <div class="ticker-card {{ 'active-green' if acct.total_pnl >= 0 else 'active-red' }}" id="ticker-{{ acct.id }}" onclick="toggleDetail({{ acct.id }})">
                 <div class="ticker-header">
-                    <span class="ticker-name">#{{ acct.id }} {{ acct.display_name }}</span>
-                    {% if acct.status == 'live' %}
+                    <span class="ticker-name">{% if acct.id == 56 %}{{ acct.display_name }}{% else %}#{{ acct.id }} {{ acct.display_name }}{% endif %}</span>
+                    {% if acct.id == 56 %}
+                    <span class="ticker-status combined"><span class="status-dot"></span> COMBINED</span>
+                    {% elif acct.status == 'live' %}
                     <span class="ticker-status live"><span class="status-dot"></span> ACTIVE</span>
                     {% else %}
                     <span class="ticker-status stopped"><span class="status-dot"></span> PAUSED</span>
                     {% endif %}
                 </div>
                 <div class="ticker-pnl {{ 'positive' if acct.pnl_pct >= 0 else 'negative' }}" id="pnl-{{ acct.id }}">{% if acct.pnl_pct >= 0 %}+{{ '%.2f' % acct.pnl_pct }}%{% else %}{{ '%.2f' % acct.pnl_pct }}%{% endif %}</div>
-                <div class="ticker-meta">{{ acct.description[:40] }}</div>
-                <div class="ticker-meta" style="margin-top:4px; font-size:0.72rem; color:#6a7a90;">{{ acct.days_live }} napja eles</div>
+                <div class="ticker-meta">{{ acct.description[:100] }}</div>
+                {% if acct.id == 56 %}
+                <div class="ticker-meta" style="margin-top:2px; font-size:0.7rem; color:var(--accent-orange); font-style:italic;">if you ran both bots together</div>
+                {% endif %}
+                <div class="ticker-meta" style="margin-top:4px; font-size:0.72rem; color:#6a7a90;">live since: {{ acct.pnl_start_date }}</div>
                 <div class="ticker-mini-chart" id="chart-{{ acct.id }}"></div>
+                <div class="ticker-cta" style="margin-top:10px; font-size:0.78rem; color:var(--accent-orange); font-weight:600; letter-spacing:0.6px; text-transform:uppercase;">click for details &nbsp;&rarr;</div>
             </div>
             {% endfor %}
         </div>
@@ -2192,7 +2208,10 @@
                         // Update status
                         const statusEl = card.querySelector('.ticker-status');
                         if (statusEl) {
-                            if (acct.status === 'live') {
+                            if (acct.id === 56) {
+                                statusEl.className = 'ticker-status combined';
+                                statusEl.innerHTML = '<span class="status-dot"></span> COMBINED';
+                            } else if (acct.status === 'live') {
                                 statusEl.className = 'ticker-status live';
                                 statusEl.innerHTML = '<span class="status-dot"></span> ACTIVE';
                             } else {
@@ -2275,6 +2294,7 @@
                 if (logout) logout.style.display = '';
                 if (data.subscription_active) {
                     if (dl) dl.style.display = '';
+                    if (autotrade) autotrade.style.display = '';
                     var dlSection = document.getElementById('downloads');
                     if (dlSection) dlSection.style.display = '';
                 }
