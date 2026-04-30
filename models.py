@@ -206,38 +206,38 @@ def reassign_payments(from_user_id: int, to_user_id: int):
                      (to_user_id, from_user_id))
 
 def set_user_email_with_merge(user_id: int, new_email: str) -> tuple[bool, str | None]:
-    """Update a user's email, auto-merging a safe orphan account if needed.
+    """Update a user's email, auto-merging the orphan account that holds the
+    email if there is one. The other account is considered a safe orphan
+    if it has no payments and no active subscription. In that case we copy
+    its social IDs (telegram, discord, google) and profile fields onto the
+    current user (only where the current user's field is empty so we don't
+    overwrite anything), reassign any payments, delete the orphan, and set
+    the current user's email.
 
-    Used when a social-auth user (e.g. Telegram, which has no email) sets
-    their real email later, and that email already exists on a different
-    "orphan" account they previously created via email+password.
+    Used by the Complete Profile flow so that, e.g., a user who registered
+    with Discord first and then signs in with Telegram can land on the
+    email-gate, type their real email, and end up on a single account that
+    has both a discord_id and a telegram_id rather than being told 'email
+    already in use'.
 
-    The other account is treated as a safe orphan if it has no payments,
-    no active subscription, and no social IDs that conflict with the
-    current user's own social IDs. In that case the orphan's password_hash
-    is copied to the current user (so email+password login still works),
-    any payments are reassigned defensively, password reset tokens are
-    deleted, the orphan row is deleted, then the current user's email is
-    updated.
-
-    Returns (success, error_message). On (False, msg) the caller should
-    show msg as a flash / JSON error.
+    Returns (success, error_message).
     """
     new_email = (new_email or "").strip().lower()
     if not new_email:
         return (False, "Email is required.")
+    fields = (
+        "id", "telegram_id", "telegram_username", "google_id", "discord_id",
+        "subscription_status", "password_hash", "display_name",
+        "first_name", "last_name",
+    )
     with _get_conn() as conn:
         cur = conn.cursor()
-        cur.execute(
-            "SELECT id, telegram_id, google_id, discord_id FROM users WHERE id=?",
-            (user_id,),
-        )
+        cur.execute(f"SELECT {', '.join(fields)} FROM users WHERE id=?", (user_id,))
         current_row = cur.fetchone()
         if not current_row:
             return (False, "User not found.")
         cur.execute(
-            "SELECT id, telegram_id, google_id, discord_id, subscription_status, password_hash "
-            "FROM users WHERE lower(email)=? AND id!=?",
+            f"SELECT {', '.join(fields)} FROM users WHERE lower(email)=? AND id!=?",
             (new_email, user_id),
         )
         other = cur.fetchone()
@@ -250,16 +250,31 @@ def set_user_email_with_merge(user_id: int, new_email: str) -> tuple[bool, str |
             return (False, "That email is already in use by another account.")
         if (other["subscription_status"] or "") in ("active", "trialing", "lifetime", "paid"):
             return (False, "That email is already in use by an active account.")
-        for field in ("telegram_id", "google_id", "discord_id"):
-            other_val = other[field]
-            current_val = current_row[field]
-            if other_val and str(other_val) != str(current_val or ""):
-                return (False, "That email is already in use by another account.")
+
+        # Copy all useful fields from the orphan -> current user, but only
+        # where the current user's field is empty (don't overwrite anything
+        # the user has already filled in).
+        backfill = {}
+        for f in (
+            "telegram_id", "telegram_username", "google_id", "discord_id",
+            "display_name", "first_name", "last_name",
+        ):
+            if other[f] and not (current_row[f] or "").strip() if isinstance(current_row[f], str) else (other[f] and not current_row[f]):
+                backfill[f] = other[f]
+        if backfill:
+            assignments = ", ".join(f"{k}=?" for k in backfill)
+            cur.execute(
+                f"UPDATE users SET {assignments} WHERE id=?",
+                (*backfill.values(), user_id),
+            )
         if other["password_hash"]:
+            # Always pull the orphan's password_hash so email+password login
+            # still works after the merge.
             cur.execute(
                 "UPDATE users SET password_hash=? WHERE id=?",
                 (other["password_hash"], user_id),
             )
+
         cur.execute("UPDATE payments SET user_id=? WHERE user_id=?", (user_id, other_id))
         cur.execute("DELETE FROM password_reset_tokens WHERE user_id=?", (other_id,))
         cur.execute("DELETE FROM users WHERE id=?", (other_id,))
